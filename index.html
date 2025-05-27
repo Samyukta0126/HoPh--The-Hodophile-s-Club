@@ -11,44 +11,29 @@
     color: #f0f0f0;
     margin: 0;
     padding: 20px;
-  }
-  header {
     text-align: center;
-    padding-bottom: 30px;
   }
   h1 {
-    font-size: 3em;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
   }
-  .icons {
-    font-size: 50px;
-    margin: 15px 0 30px;
-  }
-  .icons span {
-    margin: 0 20px;
-  }
-  #auth-section, #upload-section, #gallery-section {
-    max-width: 700px;
-    margin: 30px auto;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 20px 25px;
+  #login-section, #upload-section, #gallery-section {
+    background: rgba(255,255,255,0.1);
+    margin: 20px auto;
+    padding: 15px;
     border-radius: 10px;
+    max-width: 700px;
   }
-  input[type="text"], textarea {
-    width: 100%;
+  input, button, textarea {
+    font-family: 'Lucida Calligraphy', cursive, serif;
+    font-size: 1em;
     padding: 8px 12px;
     margin: 8px 0;
     border-radius: 5px;
     border: none;
-    font-family: 'Lucida Calligraphy', cursive, serif;
-    font-size: 1em;
+    width: 90%;
+    max-width: 400px;
   }
   button {
-    font-family: 'Lucida Calligraphy', cursive, serif;
-    font-size: 1em;
-    padding: 10px 18px;
-    border-radius: 5px;
-    border: none;
     background-color: #004d4d;
     color: #f0f0f0;
     cursor: pointer;
@@ -57,188 +42,133 @@
   button:hover {
     background-color: #006666;
   }
-  #gallery div {
-    margin-bottom: 30px;
-    border-bottom: 1px solid #f0f0f0;
-    padding-bottom: 15px;
-  }
   #gallery img {
     max-width: 100%;
     border-radius: 8px;
     box-shadow: 0 0 6px #004d4d;
   }
-  #gallery p {
-    margin: 10px 0 0 0;
-    font-size: 0.9em;
-    color: #fff;
+  .photo-item {
+    margin-bottom: 25px;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 15px;
   }
-  #welcome-msg {
-    font-size: 1.2em;
-    margin-bottom: 15px;
+  .photo-caption {
+    margin-top: 8px;
+    font-size: 1em;
+  }
+  .photo-owner {
+    font-weight: bold;
+    margin-bottom: 5px;
   }
 </style>
-<!-- Icons -->
-<link
-  rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-/>
 </head>
 <body>
 
-<header>
-  <h1>HoPh - The Hodophiles Club</h1>
-  <div class="icons">
-    <span><i class="fas fa-camera-retro"></i></span>
-    <span><i class="fas fa-compass"></i></span>
-    <span><i class="fas fa-motorcycle"></i></span>
-  </div>
-  <p style="max-width:700px; margin:auto;">Welcome to the community for all travel lovers! Share your journeys, stories, and photos here.</p>
-</header>
+<h1>HoPh - The Hodophiles Club</h1>
 
-<div id="auth-section">
-  <h2>Sign Up / Log In</h2>
-  <input type="text" id="usernameInput" placeholder="Enter your name" />
+<div id="login-section">
+  <h2>Enter Your Name to Join</h2>
+  <input type="text" id="username" placeholder="Your name" />
   <br />
-  <button onclick="logIn()">Enter</button>
-  <p id="auth-msg" style="color:#f88;"></p>
+  <button onclick="login()">Join</button>
 </div>
 
-<div id="welcome-section" style="display:none; max-width:700px; margin:auto; text-align:center;">
-  <p id="welcome-msg"></p>
-  <button onclick="logOut()">Log Out</button>
-</div>
-
-<div id="upload-section" style="display:none; max-width:700px; margin:auto;">
+<div id="upload-section" style="display:none;">
   <h2>Upload Your Travel Picture</h2>
-  <input type="text" id="caption" placeholder="Caption" />
-  <br />
   <input type="file" id="photoInput" accept="image/*" />
-  <br /><br />
+  <br />
+  <textarea id="caption" placeholder="Caption"></textarea>
+  <br />
   <button onclick="uploadPhoto()">Upload</button>
-  <p id="upload-msg" style="color:#f88;"></p>
+  <br />
+  <button onclick="logout()">Log Out</button>
 </div>
 
-<div id="gallery-section" style="max-width:700px; margin:auto;">
+<div id="gallery-section">
   <h2>Travel Gallery</h2>
-  <div id="gallery"></div>
+  <div id="gallery">No photos yet. Be the first to upload!</div>
 </div>
 
 <script>
-  // Utility: load data from localStorage or return default
-  function loadData(key, defaultValue) {
-    const data = localStorage.getItem(key);
-    return data ? JSON.parse(data) : defaultValue;
-  }
-  // Utility: save data to localStorage
-  function saveData(key, data) {
-    localStorage.setItem(key, JSON.stringify(data));
-  }
-
-  // Current logged in user
   let currentUser = null;
 
-  function logIn() {
-    const nameInput = document.getElementById('usernameInput');
+  function login() {
+    const nameInput = document.getElementById('username');
     const name = nameInput.value.trim();
-    const authMsg = document.getElementById('auth-msg');
     if (!name) {
-      authMsg.textContent = "Please enter your name.";
+      alert('Please enter your name');
       return;
     }
     currentUser = name;
-    authMsg.textContent = "";
-    showWelcome();
-    showUploadSection(true);
+    nameInput.value = '';
+    document.getElementById('login-section').style.display = 'none';
+    document.getElementById('upload-section').style.display = 'block';
     loadGallery();
   }
 
-  function logOut() {
+  function logout() {
     currentUser = null;
-    document.getElementById('welcome-section').style.display = 'none';
-    document.getElementById('auth-section').style.display = 'block';
-    showUploadSection(false);
-  }
-
-  function showWelcome() {
-    document.getElementById('auth-section').style.display = 'none';
-    document.getElementById('welcome-section').style.display = 'block';
-    document.getElementById('welcome-msg').textContent = `Welcome, ${currentUser}!`;
-  }
-
-  function showUploadSection(show) {
-    document.getElementById('upload-section').style.display = show ? 'block' : 'none';
+    document.getElementById('login-section').style.display = 'block';
+    document.getElementById('upload-section').style.display = 'none';
   }
 
   function uploadPhoto() {
-    const photoInput = document.getElementById('photoInput');
-    const captionInput = document.getElementById('caption');
-    const uploadMsg = document.getElementById('upload-msg');
+    if (!currentUser) {
+      alert('Please join first');
+      return;
+    }
 
-    const file = photoInput.files[0];
-    const caption = captionInput.value.trim();
+    const fileInput = document.getElementById('photoInput');
+    const file = fileInput.files[0];
+    const caption = document.getElementById('caption').value.trim();
 
     if (!file) {
-      uploadMsg.textContent = "Please select an image file.";
-      return;
-    }
-    if (!caption) {
-      uploadMsg.textContent = "Please enter a caption.";
+      alert('Please select a photo');
       return;
     }
 
-    // Read file as data URL (base64)
     const reader = new FileReader();
-    reader.onload = function(e) {
-      const imageDataUrl = e.target.result;
-
-      // Load existing gallery or empty array
-      const gallery = loadData('gallery', []);
-
-      // Add new photo object
-      gallery.unshift({
-        user: currentUser,
-        caption: caption,
-        imageUrl: imageDataUrl,
-        timestamp: Date.now()
-      });
-
-      saveData('gallery', gallery);
-
-      // Clear inputs and message
-      photoInput.value = "";
-      captionInput.value = "";
-      uploadMsg.textContent = "Uploaded successfully!";
-
+    reader.onload = function(event) {
+      const photoData = event.target.result; // base64 image
+      savePhoto({ owner: currentUser, caption, photoData });
+      fileInput.value = '';
+      document.getElementById('caption').value = '';
       loadGallery();
     };
     reader.readAsDataURL(file);
   }
 
+  function savePhoto(photoObj) {
+    let photos = JSON.parse(localStorage.getItem('hoph_photos') || '[]');
+    photos.unshift(photoObj); // add new photo at start
+    localStorage.setItem('hoph_photos', JSON.stringify(photos));
+  }
+
   function loadGallery() {
-    const gallery = loadData('gallery', []);
-    const galleryDiv = document.getElementById('gallery');
-    if (gallery.length === 0) {
-      galleryDiv.innerHTML = "<p>No photos uploaded yet. Be the first!</p>";
+    const gallery = document.getElementById('gallery');
+    const photos = JSON.parse(localStorage.getItem('hoph_photos') || '[]');
+
+    if (photos.length === 0) {
+      gallery.innerHTML = 'No photos yet. Be the first to upload!';
       return;
     }
-    galleryDiv.innerHTML = '';
-    gallery.forEach(item => {
+
+    gallery.innerHTML = '';
+    photos.forEach(photo => {
       const div = document.createElement('div');
+      div.classList.add('photo-item');
       div.innerHTML = `
-        <img src="${item.imageUrl}" alt="Travel photo" />
-        <p><strong>${item.user}</strong>: ${item.caption}</p>
+        <div class="photo-owner">${photo.owner}</div>
+        <img src="${photo.photoData}" alt="Travel photo" />
+        <div class="photo-caption">${photo.caption || ''}</div>
       `;
-      galleryDiv.appendChild(div);
+      gallery.appendChild(div);
     });
   }
 
-  // On page load, show auth section and load gallery
-  window.onload = function() {
-    document.getElementById('auth-section').style.display = 'block';
-    showUploadSection(false);
-    loadGallery();
-  }
+  // On page load, if photos exist show them but keep upload hidden till login
+  loadGallery();
 </script>
+
 </body>
 </html>
-
