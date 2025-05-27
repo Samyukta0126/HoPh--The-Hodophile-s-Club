@@ -10,53 +10,22 @@
     font-family: 'Lucida Calligraphy', cursive, serif;
     color: #f0f0f0;
     margin: 0;
-    padding: 0 20px 40px 20px;
+    padding: 20px;
   }
   header {
     text-align: center;
-    padding: 30px 0;
+    padding-bottom: 30px;
   }
   h1 {
     font-size: 3em;
-    margin-bottom: 0;
-  }
-  h2 {
-    margin-top: 40px;
-    border-bottom: 2px solid #f0f0f0;
-    padding-bottom: 10px;
-  }
-  p {
-    font-size: 1.1em;
-    max-width: 700px;
-    margin: 10px auto;
+    margin-bottom: 10px;
   }
   .icons {
-    text-align: center;
     font-size: 50px;
-    margin: 15px 0 30px 0;
+    margin: 15px 0 30px;
   }
   .icons span {
     margin: 0 20px;
-  }
-  input, button {
-    font-family: 'Lucida Calligraphy', cursive, serif;
-    font-size: 1em;
-    padding: 8px 12px;
-    margin: 5px 0;
-    border-radius: 5px;
-    border: none;
-  }
-  input[type="file"] {
-    padding: 3px;
-  }
-  button {
-    background-color: #004d4d;
-    color: #f0f0f0;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  button:hover {
-    background-color: #006666;
   }
   #auth-section, #upload-section, #gallery-section {
     max-width: 700px;
@@ -64,6 +33,29 @@
     background: rgba(255, 255, 255, 0.1);
     padding: 20px 25px;
     border-radius: 10px;
+  }
+  input[type="text"], textarea {
+    width: 100%;
+    padding: 8px 12px;
+    margin: 8px 0;
+    border-radius: 5px;
+    border: none;
+    font-family: 'Lucida Calligraphy', cursive, serif;
+    font-size: 1em;
+  }
+  button {
+    font-family: 'Lucida Calligraphy', cursive, serif;
+    font-size: 1em;
+    padding: 10px 18px;
+    border-radius: 5px;
+    border: none;
+    background-color: #004d4d;
+    color: #f0f0f0;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  button:hover {
+    background-color: #006666;
   }
   #gallery div {
     margin-bottom: 30px;
@@ -78,9 +70,14 @@
   #gallery p {
     margin: 10px 0 0 0;
     font-size: 0.9em;
+    color: #fff;
+  }
+  #welcome-msg {
+    font-size: 1.2em;
+    margin-bottom: 15px;
   }
 </style>
-<!-- Icons from FontAwesome CDN -->
+<!-- Icons -->
 <link
   rel="stylesheet"
   href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
@@ -95,222 +92,153 @@
     <span><i class="fas fa-compass"></i></span>
     <span><i class="fas fa-motorcycle"></i></span>
   </div>
-  <p>Welcome to the community for all travel lovers! Share your journeys, stories, and photos here.</p>
+  <p style="max-width:700px; margin:auto;">Welcome to the community for all travel lovers! Share your journeys, stories, and photos here.</p>
 </header>
 
-<!-- Authentication Section -->
 <div id="auth-section">
-  <h2>Join HoPh - Sign Up / Log In</h2>
-  <input type="email" id="email" placeholder="Email" />
-  <input type="password" id="password" placeholder="Password" />
+  <h2>Sign Up / Log In</h2>
+  <input type="text" id="usernameInput" placeholder="Enter your name" />
   <br />
-  <button id="signUpBtn">Sign Up</button>
-  <button id="logInBtn">Log In</button>
-  <button id="logoutBtn" style="display:none;">Log Out</button>
-  <p id="auth-msg"></p>
+  <button onclick="logIn()">Enter</button>
+  <p id="auth-msg" style="color:#f88;"></p>
 </div>
 
-<!-- Upload Section (hidden until logged in) -->
-<div id="upload-section" style="display:none;">
+<div id="welcome-section" style="display:none; max-width:700px; margin:auto; text-align:center;">
+  <p id="welcome-msg"></p>
+  <button onclick="logOut()">Log Out</button>
+</div>
+
+<div id="upload-section" style="display:none; max-width:700px; margin:auto;">
   <h2>Upload Your Travel Picture</h2>
-  <input type="file" id="photoInput" />
   <input type="text" id="caption" placeholder="Caption" />
   <br />
-  <button id="uploadBtn">Upload</button>
-  <p id="upload-msg"></p>
+  <input type="file" id="photoInput" accept="image/*" />
+  <br /><br />
+  <button onclick="uploadPhoto()">Upload</button>
+  <p id="upload-msg" style="color:#f88;"></p>
 </div>
 
-<!-- Gallery Section -->
-<div id="gallery-section">
+<div id="gallery-section" style="max-width:700px; margin:auto;">
   <h2>Travel Gallery</h2>
-  <div id="gallery"><p>Loading photos...</p></div>
+  <div id="gallery"></div>
 </div>
-
-<!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
 <script>
-  // Your Firebase config - replace with your own!
-  const firebaseConfig = {
-    apiKey: "AIzaSyDvDd_P82ltR7W_njeGJbSQ9Rq2aRDcaXI",
-    authDomain: "hoph-o126.firebaseapp.com",
-    projectId: "hoph-o126",
-    storageBucket: "hoph-o126.appspot.com",
-    messagingSenderId: "747851385144",
-    appId: "1:747851385144:web:1e7a4b5a63d6a04b8359cd",
-    measurementId: "G-S1D3LM6DJ8"
-  };
-
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const storage = firebase.storage();
-  const db = firebase.firestore();
-
-  const authMsg = document.getElementById('auth-msg');
-  const uploadMsg = document.getElementById('upload-msg');
-
-  // Clear messages
-  function clearMessages() {
-    authMsg.textContent = '';
-    uploadMsg.textContent = '';
+  // Utility: load data from localStorage or return default
+  function loadData(key, defaultValue) {
+    const data = localStorage.getItem(key);
+    return data ? JSON.parse(data) : defaultValue;
+  }
+  // Utility: save data to localStorage
+  function saveData(key, data) {
+    localStorage.setItem(key, JSON.stringify(data));
   }
 
-  // Sign Up function
-  document.getElementById('signUpBtn').addEventListener('click', () => {
-    clearMessages();
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
-    if (!email || !password) {
-      authMsg.textContent = "Email and password required.";
+  // Current logged in user
+  let currentUser = null;
+
+  function logIn() {
+    const nameInput = document.getElementById('usernameInput');
+    const name = nameInput.value.trim();
+    const authMsg = document.getElementById('auth-msg');
+    if (!name) {
+      authMsg.textContent = "Please enter your name.";
       return;
     }
-    auth.createUserWithEmailAndPassword(email, password)
-      .then(() => {
-        authMsg.textContent = "Signed up successfully! You are now logged in.";
-        toggleAuthState();
-      })
-      .catch(error => {
-        authMsg.textContent = "Sign Up Error: " + error.message;
-      });
-  });
-
-  // Log In function
-  document.getElementById('logInBtn').addEventListener('click', () => {
-    clearMessages();
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
-    if (!email || !password) {
-      authMsg.textContent = "Email and password required.";
-      return;
-    }
-    auth.signInWithEmailAndPassword(email, password)
-      .then(() => {
-        authMsg.textContent = "Logged in successfully!";
-        toggleAuthState();
-      })
-      .catch(error => {
-        authMsg.textContent = "Login Error: " + error.message;
-      });
-  });
-
-  // Log Out function
-  document.getElementById('logoutBtn').addEventListener('click', () => {
-    clearMessages();
-    auth.signOut().then(() => {
-      authMsg.textContent = "Logged out.";
-      toggleAuthState();
-    });
-  });
-
-  // Show/hide UI based on auth state
-  function toggleAuthState() {
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        document.getElementById('upload-section').style.display = 'block';
-        document.getElementById('logoutBtn').style.display = 'inline-block';
-        document.getElementById('signUpBtn').style.display = 'none';
-        document.getElementById('logInBtn').style.display = 'none';
-        document.getElementById('email').style.display = 'none';
-        document.getElementById('password').style.display = 'none';
-      } else {
-        document.getElementById('upload-section').style.display = 'none';
-        document.getElementById('logoutBtn').style.display = 'none';
-        document.getElementById('signUpBtn').style.display = 'inline-block';
-        document.getElementById('logInBtn').style.display = 'inline-block';
-        document.getElementById('email').style.display = 'inline-block';
-        document.getElementById('password').style.display = 'inline-block';
-      }
-    });
-  }
-
-  // Upload photo function
-  document.getElementById('uploadBtn').addEventListener('click', () => {
-    clearMessages();
-    const fileInput = document.getElementById('photoInput');
-    const file = fileInput.files[0];
-    const caption = document.getElementById('caption').value.trim();
-    if (!file) {
-      uploadMsg.textContent = "Please select a photo.";
-      return;
-    }
-    const user = auth.currentUser;
-    if (!user) {
-      uploadMsg.textContent = "You must be logged in to upload.";
-      return;
-    }
-
-    const storageRef = storage.ref();
-    const photoRef = storageRef.child('photos/' + user.uid + '/' + Date.now() + '_' + file.name);
-    const uploadTask = photoRef.put(file);
-
-    uploadMsg.textContent = "Uploading...";
-
-    uploadTask.on('state_changed', 
-      snapshot => {
-        // Progress can be tracked here if needed
-      },
-      error => {
-        uploadMsg.textContent = "Upload failed: " + error.message;
-      },
-      () => {
-        uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
-          // Save photo info in Firestore
-          db.collection('photos').add({
-            uid: user.uid,
-            email: user.email,
-            url: downloadURL,
-            caption: caption,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-          })
-          .then(() => {
-            uploadMsg.textContent = "Upload successful!";
-            fileInput.value = '';
-            document.getElementById('caption').value = '';
-            loadGallery();
-          })
-          .catch(error => {
-            uploadMsg.textContent = "Error saving to database: " + error.message;
-          });
-        });
-      }
-    );
-  });
-
-  // Load photos from Firestore and display gallery
-  function loadGallery() {
-    const gallery = document.getElementById('gallery');
-    gallery.innerHTML = '<p>Loading photos...</p>';
-    db.collection('photos').orderBy('timestamp', 'desc').limit(20).get()
-      .then(snapshot => {
-        if (snapshot.empty) {
-          gallery.innerHTML = '<p>No photos uploaded yet.</p>';
-          return;
-        }
-        gallery.innerHTML = '';
-        snapshot.forEach(doc => {
-          const data = doc.data();
-          const div = document.createElement('div');
-          div.innerHTML = `
-            <img src="${data.url}" alt="Travel photo" />
-            <p><strong>${data.email}</strong>: ${data.caption || ''}</p>
-          `;
-          gallery.appendChild(div);
-        });
-      })
-      .catch(error => {
-        gallery.innerHTML = `<p>Error loading photos: ${error.message}</p>`;
-      });
-  }
-
-  // Initialize UI and gallery on page load
-  window.onload = () => {
-    toggleAuthState();
+    currentUser = name;
+    authMsg.textContent = "";
+    showWelcome();
+    showUploadSection(true);
     loadGallery();
-  };
+  }
+
+  function logOut() {
+    currentUser = null;
+    document.getElementById('welcome-section').style.display = 'none';
+    document.getElementById('auth-section').style.display = 'block';
+    showUploadSection(false);
+  }
+
+  function showWelcome() {
+    document.getElementById('auth-section').style.display = 'none';
+    document.getElementById('welcome-section').style.display = 'block';
+    document.getElementById('welcome-msg').textContent = `Welcome, ${currentUser}!`;
+  }
+
+  function showUploadSection(show) {
+    document.getElementById('upload-section').style.display = show ? 'block' : 'none';
+  }
+
+  function uploadPhoto() {
+    const photoInput = document.getElementById('photoInput');
+    const captionInput = document.getElementById('caption');
+    const uploadMsg = document.getElementById('upload-msg');
+
+    const file = photoInput.files[0];
+    const caption = captionInput.value.trim();
+
+    if (!file) {
+      uploadMsg.textContent = "Please select an image file.";
+      return;
+    }
+    if (!caption) {
+      uploadMsg.textContent = "Please enter a caption.";
+      return;
+    }
+
+    // Read file as data URL (base64)
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const imageDataUrl = e.target.result;
+
+      // Load existing gallery or empty array
+      const gallery = loadData('gallery', []);
+
+      // Add new photo object
+      gallery.unshift({
+        user: currentUser,
+        caption: caption,
+        imageUrl: imageDataUrl,
+        timestamp: Date.now()
+      });
+
+      saveData('gallery', gallery);
+
+      // Clear inputs and message
+      photoInput.value = "";
+      captionInput.value = "";
+      uploadMsg.textContent = "Uploaded successfully!";
+
+      loadGallery();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function loadGallery() {
+    const gallery = loadData('gallery', []);
+    const galleryDiv = document.getElementById('gallery');
+    if (gallery.length === 0) {
+      galleryDiv.innerHTML = "<p>No photos uploaded yet. Be the first!</p>";
+      return;
+    }
+    galleryDiv.innerHTML = '';
+    gallery.forEach(item => {
+      const div = document.createElement('div');
+      div.innerHTML = `
+        <img src="${item.imageUrl}" alt="Travel photo" />
+        <p><strong>${item.user}</strong>: ${item.caption}</p>
+      `;
+      galleryDiv.appendChild(div);
+    });
+  }
+
+  // On page load, show auth section and load gallery
+  window.onload = function() {
+    document.getElementById('auth-section').style.display = 'block';
+    showUploadSection(false);
+    loadGallery();
+  }
 </script>
 </body>
 </html>
+
