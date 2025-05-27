@@ -133,34 +133,21 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
 <script>
-  // Your Firebase config - REPLACE with your own!
+  // Your Firebase config
   const firebaseConfig = {
-   
+    apiKey: "AIzaSyDvDd_P82ltR7W_njeGJbSQ9Rq2aRDcaXI",
+    authDomain: "hoph-o126.firebaseapp.com",
+    projectId: "hoph-o126",
+    storageBucket: "hoph-o126.appspot.com",
+    messagingSenderId: "747851385144",
+    appId: "1:747851385144:web:1e7a4b5a63d6a04b8359cd",
+    measurementId: "G-S1D3LM6DJ8"
   };
 
   // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
-  const auth = firebase.a// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyDvDd_P82ltR7W_njeGJbSQ9Rq2aRDcaXI",
-  authDomain: "hoph-o126.firebaseapp.com",
-  projectId: "hoph-o126",
-  storageBucket: "hoph-o126.appspot.com",
-  messagingSenderId: "747851385144",
-  appId: "1:747851385144:web:1e7a4b5a63d6a04b8359cd",
-  measurementId: "G-S1D3LM6DJ8"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);uth();
+  const auth = firebase.auth();
   const storage = firebase.storage();
   const db = firebase.firestore();
 
@@ -214,9 +201,11 @@ const analytics = getAnalytics(app);uth();
       if (user) {
         document.getElementById('upload-section').style.display = 'block';
         document.getElementById('logoutBtn').style.display = 'inline-block';
+        document.getElementById('auth-msg').textContent = `Welcome, ${user.email}`;
       } else {
         document.getElementById('upload-section').style.display = 'none';
         document.getElementById('logoutBtn').style.display = 'none';
+        document.getElementById('auth-msg').textContent = '';
       }
     });
   }
@@ -263,6 +252,10 @@ const analytics = getAnalytics(app);uth();
     gallery.innerHTML = '<p>Loading photos...</p>';
     db.collection('photos').orderBy('timestamp', 'desc').get().then(snapshot => {
       gallery.innerHTML = '';
+      if (snapshot.empty) {
+        gallery.innerHTML = '<p>No photos uploaded yet. Be the first!</p>';
+        return;
+      }
       snapshot.forEach(doc => {
         const data = doc.data();
         const div = document.createElement('div');
@@ -272,18 +265,16 @@ const analytics = getAnalytics(app);uth();
         `;
         gallery.appendChild(div);
       });
-      if (gallery.innerHTML === '') {
-        gallery.innerHTML = '<p>No photos uploaded yet. Be the first!</p>';
-      }
     }).catch(() => {
       gallery.innerHTML = '<p>Failed to load photos.</p>';
     });
   }
 
+  // Initialize on page load
   window.onload = function() {
     toggleAuthState();
     loadGallery();
-  }
+  };
 </script>
 </body>
 </html>
