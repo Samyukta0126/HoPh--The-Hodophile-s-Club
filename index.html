@@ -1,95 +1,242 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>HoPh - Travel Community</title>
-  <style>
-    body { font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; background:#eef;}
-    h1, h2 { text-align: center; }
-    #posts div { border-bottom: 1px solid #ccc; padding: 10px 0; }
-    input, textarea, button { width: 100%; padding: 8px; margin: 5px 0; }
-    button { background: teal; color: white; border: none; cursor: pointer; }
-    button:hover { background: darkcyan; }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>HoPh - The Hodophiles Club</title>
+<style>
+  body {
+    background-color: #008080;
+    font-family: 'Lucida Calligraphy', cursive, serif;
+    color: #f0f0f0;
+    margin: 0;
+    padding: 0 20px 40px 20px;
+  }
+  header {
+    text-align: center;
+    padding: 30px 0;
+  }
+  h1 {
+    font-size: 3em;
+    margin-bottom: 0;
+  }
+  h2 {
+    margin-top: 40px;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 10px;
+  }
+  p {
+    font-size: 1.1em;
+    max-width: 700px;
+    margin: 10px auto;
+  }
+  .icons {
+    text-align: center;
+    font-size: 50px;
+    margin: 15px 0 30px 0;
+  }
+  .icons span {
+    margin: 0 20px;
+  }
+  input, button, textarea {
+    font-family: 'Lucida Calligraphy', cursive, serif;
+    font-size: 1em;
+    padding: 8px 12px;
+    margin: 5px 0;
+    border-radius: 5px;
+    border: none;
+  }
+  textarea {
+    width: 100%;
+    max-width: 700px;
+    height: 100px;
+    resize: vertical;
+  }
+  button {
+    background-color: #004d4d;
+    color: #f0f0f0;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  button:hover {
+    background-color: #006666;
+  }
+  #auth-section, #post-section, #community-section {
+    max-width: 700px;
+    margin: 30px auto;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px 25px;
+    border-radius: 10px;
+  }
+  #community {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-top: 10px;
+  }
+  .post {
+    border-bottom: 1px solid #f0f0f0;
+    padding: 10px 0;
+  }
+  .post strong {
+    color: #e0f7f7;
+  }
+</style>
+<!-- FontAwesome Icons -->
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+/>
 </head>
 <body>
 
+<header>
   <h1>HoPh - The Hodophiles Club</h1>
+  <div class="icons">
+    <span><i class="fas fa-plane"></i></span>
+    <span><i class="fas fa-globe"></i></span>
+    <span><i class="fas fa-mountain"></i></span>
+  </div>
+  <p>Welcome to the community for all travel lovers! Share your travel dreams and inspire others.</p>
+</header>
+
+<!-- Login Section -->
+<div id="auth-section">
+  <h2>Join the Club - Enter Your Name</h2>
+  <input type="text" id="username" placeholder="Your Name" />
+  <br />
+  <button onclick="login()">Enter</button>
+  <p id="auth-msg"></p>
+</div>
+
+<!-- Post Travel Dream Section -->
+<div id="post-section" style="display:none;">
   <h2>Share Your Travel Dream</h2>
+  <textarea id="travelDream" placeholder="Write your travel dream here..."></textarea>
+  <br />
+  <button onclick="postDream()">Post</button>
+  <button onclick="logout()" style="float:right; background:#660000;">Log Out</button>
+  <p id="post-msg"></p>
+</div>
 
-  <input id="nameInput" placeholder="Your Name" />
-  <textarea id="dreamInput" placeholder="Your Travel Dream / Inspiration"></textarea>
-  <button onclick="addPost()">Share</button>
+<!-- Community Wall -->
+<div id="community-section" style="display:none;">
+  <h2>Travelers' Community Wall</h2>
+  <div id="community"></div>
+</div>
 
-  <h2>Community Travel Inspirations</h2>
-  <div id="posts">Loading posts...</div>
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script>
+  // Your Firebase config - REPLACE with your own config
+  const firebaseConfig = {
+    apiKey: "AIzaSyDvDd_P82ltR7W_njeGJbSQ9Rq2aRDcaXI",
+    authDomain: "hoph-o126.firebaseapp.com",
+    projectId: "hoph-o126",
+    storageBucket: "hoph-o126.appspot.com",
+    messagingSenderId: "747851385144",
+    appId: "1:747851385144:web:1e7a4b5a63d6a04b8359cd",
+    measurementId: "G-S1D3LM6DJ8"
+  };
 
-  <script>
-    // Your Firebase config — REPLACE with your config!
-    const firebaseConfig = {
-      apiKey: "AIzaSyDvDd_P82ltR7W_njeGJbSQ9Rq2aRDcaXI",
-      authDomain: "hoph-o126.firebaseapp.com",
-      projectId: "hoph-o126",
-      storageBucket: "hoph-o126.appspot.com",
-      messagingSenderId: "747851385144",
-      appId: "1:747851385144:web:1e7a4b5a63d6a04b8359cd",
-      measurementId: "G-S1D3LM6DJ8"
-    };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
 
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+  let currentUser = null;
 
-    const postsDiv = document.getElementById('posts');
+  function login() {
+    const nameInput = document.getElementById('username');
+    const name = nameInput.value.trim();
+    const authMsg = document.getElementById('auth-msg');
+    if (!name) {
+      authMsg.textContent = "Please enter your name.";
+      return;
+    }
+    currentUser = name;
+    authMsg.textContent = "";
+    nameInput.value = "";
+    document.getElementById('auth-section').style.display = 'none';
+    document.getElementById('post-section').style.display = 'block';
+    document.getElementById('community-section').style.display = 'block';
+    listenToCommunity();
+  }
 
-    function addPost() {
-      const name = document.getElementById('nameInput').value.trim();
-      const dream = document.getElementById('dreamInput').value.trim();
-      if (!name || !dream) {
-        alert("Please enter both your name and your travel dream.");
-        return;
-      }
-      db.collection('travelDreams').add({
-        name: name,
-        dream: dream,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(() => {
-        document.getElementById('nameInput').value = '';
-        document.getElementById('dreamInput').value = '';
-      }).catch(e => alert("Error adding post: " + e.message));
+  function logout() {
+    currentUser = null;
+    document.getElementById('auth-section').style.display = 'block';
+    document.getElementById('post-section').style.display = 'none';
+    document.getElementById('community-section').style.display = 'none';
+    document.getElementById('post-msg').textContent = "";
+    document.getElementById('community').innerHTML = "";
+  }
+
+  function postDream() {
+    const dreamInput = document.getElementById('travelDream');
+    const dream = dreamInput.value.trim();
+    const postMsg = document.getElementById('post-msg');
+
+    if (!dream) {
+      postMsg.textContent = "Please write your travel dream before posting.";
+      return;
+    }
+    if (!currentUser) {
+      postMsg.textContent = "Please login first.";
+      return;
     }
 
-    function renderPosts(snapshot) {
-      postsDiv.innerHTML = '';
-      if (snapshot.empty) {
-        postsDiv.innerHTML = '<p>No posts yet. Be the first!</p>';
-        return;
-      }
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        const div = document.createElement('div');
-        div.innerHTML = `<strong>${data.name}</strong>: ${data.dream}`;
-        postsDiv.appendChild(div);
-      });
-    }
+    // Add post to Firestore
+    db.collection('travelDreams').add({
+      name: currentUser,
+      dream: dream,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(() => {
+      postMsg.textContent = "Travel dream posted!";
+      dreamInput.value = "";
+    }).catch(error => {
+      postMsg.textContent = "Error posting travel dream: " + error.message;
+    });
+  }
 
-    // Real-time listener for posts ordered by newest first
-    db.collection('travelDreams').orderBy('timestamp', 'desc')
-      .onSnapshot(renderPosts, err => {
-        postsDiv.innerHTML = `<p>Error loading posts: ${err.message}</p>`;
-      });
-  </script>
+  function listenToCommunity() {
+    const communityDiv = document.getElementById('community');
+    communityDiv.innerHTML = "<p>Loading community posts...</p>";
 
+    db.collection('travelDreams')
+      .orderBy('timestamp', 'desc')
+      .onSnapshot(snapshot => {
+        communityDiv.innerHTML = "";
+        if (snapshot.empty) {
+          communityDiv.innerHTML = "<p>No travel dreams posted yet. Be the first!</p>";
+          return;
+        }
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          const postDiv = document.createElement('div');
+          postDiv.classList.add('post');
+          postDiv.innerHTML = `<strong>${escapeHtml(data.name)}</strong>: ${escapeHtml(data.dream)}`;
+          communityDiv.appendChild(postDiv);
+        });
+      }, error => {
+        communityDiv.innerHTML = "<p>Error loading community posts.</p>";
+      });
+  }
+
+  // Simple HTML escape to avoid injection
+  function escapeHtml(text) {
+    return text.replace(/[&<>"']/g, function(m) {
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];
+    });
+  }
+</script>
 </body>
 </html>
 
-   
+ 
 
+
+   
 
 
 
