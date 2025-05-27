@@ -10,28 +10,44 @@
     font-family: 'Lucida Calligraphy', cursive, serif;
     color: #f0f0f0;
     margin: 0;
-    padding: 20px;
+    padding: 0 20px 40px 20px;
+  }
+  header {
     text-align: center;
+    padding: 30px 0;
   }
   h1 {
-    margin-bottom: 5px;
+    font-size: 3em;
+    margin-bottom: 0;
   }
-  #login-section, #upload-section, #gallery-section {
-    background: rgba(255,255,255,0.1);
-    margin: 20px auto;
-    padding: 15px;
-    border-radius: 10px;
+  h2 {
+    margin-top: 40px;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 10px;
+  }
+  p {
+    font-size: 1.1em;
     max-width: 700px;
+    margin: 10px auto;
   }
-  input, button, textarea {
+  .icons {
+    text-align: center;
+    font-size: 50px;
+    margin: 15px 0 30px 0;
+  }
+  .icons span {
+    margin: 0 20px;
+  }
+  input, button {
     font-family: 'Lucida Calligraphy', cursive, serif;
     font-size: 1em;
     padding: 8px 12px;
-    margin: 8px 0;
+    margin: 5px 0;
     border-radius: 5px;
     border: none;
-    width: 90%;
-    max-width: 400px;
+  }
+  input[type="file"] {
+    padding: 3px;
   }
   button {
     background-color: #004d4d;
@@ -42,51 +58,73 @@
   button:hover {
     background-color: #006666;
   }
+  #login-section, #upload-section, #gallery-section {
+    max-width: 700px;
+    margin: 30px auto;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px 25px;
+    border-radius: 10px;
+  }
+  #gallery div.photo-item {
+    margin-bottom: 30px;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 15px;
+  }
   #gallery img {
     max-width: 100%;
     border-radius: 8px;
     box-shadow: 0 0 6px #004d4d;
   }
-  .photo-item {
-    margin-bottom: 25px;
-    border-bottom: 1px solid #f0f0f0;
-    padding-bottom: 15px;
-  }
-  .photo-caption {
-    margin-top: 8px;
-    font-size: 1em;
-  }
-  .photo-owner {
+  #gallery .photo-owner {
     font-weight: bold;
+    font-size: 1.1em;
     margin-bottom: 5px;
   }
+  #gallery .photo-caption {
+    margin-top: 5px;
+    font-style: italic;
+  }
 </style>
+<!-- Icons from FontAwesome CDN -->
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+/>
 </head>
 <body>
 
-<h1>HoPh - The Hodophiles Club</h1>
+<header>
+  <h1>HoPh - The Hodophiles Club</h1>
+  <div class="icons">
+    <span><i class="fas fa-camera-retro"></i></span>
+    <span><i class="fas fa-compass"></i></span>
+    <span><i class="fas fa-motorcycle"></i></span>
+  </div>
+  <p>Welcome to the community for all travel lovers! Share your journeys, stories, and photos here.</p>
+</header>
 
+<!-- Login Section -->
 <div id="login-section">
-  <h2>Enter Your Name to Join</h2>
-  <input type="text" id="username" placeholder="Your name" />
+  <h2>Join HoPh - Enter Your Name</h2>
+  <input type="text" id="username" placeholder="Your Name" />
   <br />
   <button onclick="login()">Join</button>
 </div>
 
+<!-- Upload Section (hidden until login) -->
 <div id="upload-section" style="display:none;">
   <h2>Upload Your Travel Picture</h2>
   <input type="file" id="photoInput" accept="image/*" />
-  <br />
-  <textarea id="caption" placeholder="Caption"></textarea>
+  <input type="text" id="caption" placeholder="Caption" />
   <br />
   <button onclick="uploadPhoto()">Upload</button>
-  <br />
-  <button onclick="logout()">Log Out</button>
+  <button onclick="logout()" style="margin-left: 20px;">Log Out</button>
 </div>
 
+<!-- Gallery Section -->
 <div id="gallery-section">
   <h2>Travel Gallery</h2>
-  <div id="gallery">No photos yet. Be the first to upload!</div>
+  <div id="gallery">Loading photos...</div>
 </div>
 
 <script>
@@ -130,9 +168,16 @@
     const reader = new FileReader();
     reader.onload = function(event) {
       const photoData = event.target.result; // base64 image
-      savePhoto({ owner: currentUser, caption, photoData });
+
+      // Save photo with owner, caption, and timestamp
+      savePhoto({ owner: currentUser, caption, photoData, timestamp: Date.now() });
+
       fileInput.value = '';
       document.getElementById('caption').value = '';
+
+      // Flash username on screen when post uploaded
+      flashUsername(currentUser);
+
       loadGallery();
     };
     reader.readAsDataURL(file);
@@ -166,7 +211,32 @@
     });
   }
 
-  // On page load, if photos exist show them but keep upload hidden till login
+  // Flash the username briefly on upload
+  function flashUsername(name) {
+    let flashDiv = document.getElementById('flash-username');
+    if (!flashDiv) {
+      flashDiv = document.createElement('div');
+      flashDiv.id = 'flash-username';
+      flashDiv.style.position = 'fixed';
+      flashDiv.style.top = '20px';
+      flashDiv.style.right = '20px';
+      flashDiv.style.backgroundColor = '#004d4d';
+      flashDiv.style.color = '#f0f0f0';
+      flashDiv.style.padding = '10px 20px';
+      flashDiv.style.borderRadius = '8px';
+      flashDiv.style.fontSize = '1.2em';
+      flashDiv.style.zIndex = 1000;
+      document.body.appendChild(flashDiv);
+    }
+    flashDiv.textContent = `${name} just uploaded a photo!`;
+    flashDiv.style.opacity = 1;
+    setTimeout(() => {
+      flashDiv.style.transition = 'opacity 1s ease';
+      flashDiv.style.opacity = 0;
+    }, 2000);
+  }
+
+  // On page load show gallery (upload hidden until login)
   loadGallery();
 </script>
 
