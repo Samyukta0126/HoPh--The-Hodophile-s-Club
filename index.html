@@ -1,244 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>HoPh - The Hodophiles Club</title>
-<style>
-  body {
-    background-color: #008080;
-    font-family: 'Lucida Calligraphy', cursive, serif;
-    color: #f0f0f0;
-    margin: 0;
-    padding: 0 20px 40px 20px;
-  }
-  header {
-    text-align: center;
-    padding: 30px 0;
-  }
-  h1 {
-    font-size: 3em;
-    margin-bottom: 0;
-  }
-  h2 {
-    margin-top: 40px;
-    border-bottom: 2px solid #f0f0f0;
-    padding-bottom: 10px;
-  }
-  p {
-    font-size: 1.1em;
-    max-width: 700px;
-    margin: 10px auto;
-  }
-  .icons {
-    text-align: center;
-    font-size: 50px;
-    margin: 15px 0 30px 0;
-  }
-  .icons span {
-    margin: 0 20px;
-  }
-  input, button {
-    font-family: 'Lucida Calligraphy', cursive, serif;
-    font-size: 1em;
-    padding: 8px 12px;
-    margin: 5px 0;
-    border-radius: 5px;
-    border: none;
-  }
-  input[type="file"] {
-    padding: 3px;
-  }
-  button {
-    background-color: #004d4d;
-    color: #f0f0f0;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  button:hover {
-    background-color: #006666;
-  }
-  #login-section, #upload-section, #gallery-section {
-    max-width: 700px;
-    margin: 30px auto;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 20px 25px;
-    border-radius: 10px;
-  }
-  #gallery div.photo-item {
-    margin-bottom: 30px;
-    border-bottom: 1px solid #f0f0f0;
-    padding-bottom: 15px;
-  }
-  #gallery img {
-    max-width: 100%;
-    border-radius: 8px;
-    box-shadow: 0 0 6px #004d4d;
-  }
-  #gallery .photo-owner {
-    font-weight: bold;
-    font-size: 1.1em;
-    margin-bottom: 5px;
-  }
-  #gallery .photo-caption {
-    margin-top: 5px;
-    font-style: italic;
-  }
-</style>
-<!-- Icons from FontAwesome CDN -->
-<link
-  rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HoPh - Travel Community</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; background:#eef;}
+    h1, h2 { text-align: center; }
+    #posts div { border-bottom: 1px solid #ccc; padding: 10px 0; }
+    input, textarea, button { width: 100%; padding: 8px; margin: 5px 0; }
+    button { background: teal; color: white; border: none; cursor: pointer; }
+    button:hover { background: darkcyan; }
+  </style>
 </head>
 <body>
 
-<header>
   <h1>HoPh - The Hodophiles Club</h1>
-  <div class="icons">
-    <span><i class="fas fa-camera-retro"></i></span>
-    <span><i class="fas fa-compass"></i></span>
-    <span><i class="fas fa-motorcycle"></i></span>
-  </div>
-  <p>Welcome to the community for all travel lovers! Share your journeys, stories, and photos here.</p>
-</header>
+  <h2>Share Your Travel Dream</h2>
 
-<!-- Login Section -->
-<div id="login-section">
-  <h2>Join HoPh - Enter Your Name</h2>
-  <input type="text" id="username" placeholder="Your Name" />
-  <br />
-  <button onclick="login()">Join</button>
-</div>
+  <input id="nameInput" placeholder="Your Name" />
+  <textarea id="dreamInput" placeholder="Your Travel Dream / Inspiration"></textarea>
+  <button onclick="addPost()">Share</button>
 
-<!-- Upload Section (hidden until login) -->
-<div id="upload-section" style="display:none;">
-  <h2>Upload Your Travel Picture</h2>
-  <input type="file" id="photoInput" accept="image/*" />
-  <input type="text" id="caption" placeholder="Caption" />
-  <br />
-  <button onclick="uploadPhoto()">Upload</button>
-  <button onclick="logout()" style="margin-left: 20px;">Log Out</button>
-</div>
+  <h2>Community Travel Inspirations</h2>
+  <div id="posts">Loading posts...</div>
 
-<!-- Gallery Section -->
-<div id="gallery-section">
-  <h2>Travel Gallery</h2>
-  <div id="gallery">Loading photos...</div>
-</div>
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
-<script>
-  let currentUser = null;
-
-  function login() {
-    const nameInput = document.getElementById('username');
-    const name = nameInput.value.trim();
-    if (!name) {
-      alert('Please enter your name');
-      return;
-    }
-    currentUser = name;
-    nameInput.value = '';
-    document.getElementById('login-section').style.display = 'none';
-    document.getElementById('upload-section').style.display = 'block';
-    loadGallery();
-  }
-
-  function logout() {
-    currentUser = null;
-    document.getElementById('login-section').style.display = 'block';
-    document.getElementById('upload-section').style.display = 'none';
-  }
-
-  function uploadPhoto() {
-    if (!currentUser) {
-      alert('Please join first');
-      return;
-    }
-
-    const fileInput = document.getElementById('photoInput');
-    const file = fileInput.files[0];
-    const caption = document.getElementById('caption').value.trim();
-
-    if (!file) {
-      alert('Please select a photo');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = function(event) {
-      const photoData = event.target.result; // base64 image
-
-      // Save photo with owner, caption, and timestamp
-      savePhoto({ owner: currentUser, caption, photoData, timestamp: Date.now() });
-
-      fileInput.value = '';
-      document.getElementById('caption').value = '';
-
-      // Flash username on screen when post uploaded
-      flashUsername(currentUser);
-
-      loadGallery();
+  <script>
+    // Your Firebase config — REPLACE with your config!
+    const firebaseConfig = {
+      apiKey: "AIzaSyDvDd_P82ltR7W_njeGJbSQ9Rq2aRDcaXI",
+      authDomain: "hoph-o126.firebaseapp.com",
+      projectId: "hoph-o126",
+      storageBucket: "hoph-o126.appspot.com",
+      messagingSenderId: "747851385144",
+      appId: "1:747851385144:web:1e7a4b5a63d6a04b8359cd",
+      measurementId: "G-S1D3LM6DJ8"
     };
-    reader.readAsDataURL(file);
-  }
 
-  function savePhoto(photoObj) {
-    let photos = JSON.parse(localStorage.getItem('hoph_photos') || '[]');
-    photos.unshift(photoObj); // add new photo at start
-    localStorage.setItem('hoph_photos', JSON.stringify(photos));
-  }
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-  function loadGallery() {
-    const gallery = document.getElementById('gallery');
-    const photos = JSON.parse(localStorage.getItem('hoph_photos') || '[]');
+    const postsDiv = document.getElementById('posts');
 
-    if (photos.length === 0) {
-      gallery.innerHTML = 'No photos yet. Be the first to upload!';
-      return;
+    function addPost() {
+      const name = document.getElementById('nameInput').value.trim();
+      const dream = document.getElementById('dreamInput').value.trim();
+      if (!name || !dream) {
+        alert("Please enter both your name and your travel dream.");
+        return;
+      }
+      db.collection('travelDreams').add({
+        name: name,
+        dream: dream,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        document.getElementById('nameInput').value = '';
+        document.getElementById('dreamInput').value = '';
+      }).catch(e => alert("Error adding post: " + e.message));
     }
 
-    gallery.innerHTML = '';
-    photos.forEach(photo => {
-      const div = document.createElement('div');
-      div.classList.add('photo-item');
-      div.innerHTML = `
-        <div class="photo-owner">${photo.owner}</div>
-        <img src="${photo.photoData}" alt="Travel photo" />
-        <div class="photo-caption">${photo.caption || ''}</div>
-      `;
-      gallery.appendChild(div);
-    });
-  }
-
-  // Flash the username briefly on upload
-  function flashUsername(name) {
-    let flashDiv = document.getElementById('flash-username');
-    if (!flashDiv) {
-      flashDiv = document.createElement('div');
-      flashDiv.id = 'flash-username';
-      flashDiv.style.position = 'fixed';
-      flashDiv.style.top = '20px';
-      flashDiv.style.right = '20px';
-      flashDiv.style.backgroundColor = '#004d4d';
-      flashDiv.style.color = '#f0f0f0';
-      flashDiv.style.padding = '10px 20px';
-      flashDiv.style.borderRadius = '8px';
-      flashDiv.style.fontSize = '1.2em';
-      flashDiv.style.zIndex = 1000;
-      document.body.appendChild(flashDiv);
+    function renderPosts(snapshot) {
+      postsDiv.innerHTML = '';
+      if (snapshot.empty) {
+        postsDiv.innerHTML = '<p>No posts yet. Be the first!</p>';
+        return;
+      }
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const div = document.createElement('div');
+        div.innerHTML = `<strong>${data.name}</strong>: ${data.dream}`;
+        postsDiv.appendChild(div);
+      });
     }
-    flashDiv.textContent = `${name} just uploaded a photo!`;
-    flashDiv.style.opacity = 1;
-    setTimeout(() => {
-      flashDiv.style.transition = 'opacity 1s ease';
-      flashDiv.style.opacity = 0;
-    }, 2000);
-  }
 
-  // On page load show gallery (upload hidden until login)
-  loadGallery();
-</script>
+    // Real-time listener for posts ordered by newest first
+    db.collection('travelDreams').orderBy('timestamp', 'desc')
+      .onSnapshot(renderPosts, err => {
+        postsDiv.innerHTML = `<p>Error loading posts: ${err.message}</p>`;
+      });
+  </script>
 
 </body>
 </html>
+
+   
+
+
+
+
+
+
+      
+
