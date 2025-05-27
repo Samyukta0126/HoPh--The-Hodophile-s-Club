@@ -1,171 +1,289 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>HoPh - The Hodophiles Club</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&family=Cinzel&display=swap" rel="stylesheet">
-  <script src="https://kit.fontawesome.com/a2d05d4f74.js" crossorigin="anonymous"></script>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Dancing Script', cursive;
-      background-color: #e8f5f4;
-      color: #004d4d;
-    }
-
-    header {
-      background-color: #008080;
-      color: white;
-      padding: 2rem;
-      text-align: center;
-    }
-
-    header h1 {
-      font-size: 3rem;
-      margin-bottom: 0.5rem;
-      font-family: 'Cinzel', serif;
-    }
-
-    header p {
-      font-size: 1.2rem;
-      font-style: italic;
-    }
-
-    section {
-      padding: 2rem;
-      max-width: 900px;
-      margin: auto;
-    }
-
-    .icon-row {
-      font-size: 2rem;
-      text-align: center;
-      margin: 1rem 0;
-    }
-
-    .icon-row i {
-      margin: 0 10px;
-      color: #006666;
-    }
-
-    .form-box, .dream-box {
-      background: #ffffff;
-      border: 2px dashed #008080;
-      padding: 1rem;
-      margin-top: 1rem;
-      border-radius: 10px;
-    }
-
-    .gallery {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1rem;
-    }
-
-    .gallery img {
-      width: 100%;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      transition: transform 0.3s;
-    }
-
-    .gallery img:hover {
-      transform: scale(1.05);
-    }
-
-    footer {
-      text-align: center;
-      padding: 1rem;
-      background-color: #004d4d;
-      color: white;
-      margin-top: 3rem;
-    }
-
-    input, textarea {
-      width: 100%;
-      padding: 0.5rem;
-      font-family: inherit;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-
-    button {
-      background-color: #008080;
-      color: white;
-      border: none;
-      padding: 0.6rem 1.2rem;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-      margin-top: 0.5rem;
-    }
-
-    button:hover {
-      background-color: #006666;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>HoPh - The Hodophiles Club</title>
+<style>
+  body {
+    background-color: #008080;
+    font-family: 'Lucida Calligraphy', cursive, serif;
+    color: #f0f0f0;
+    margin: 0;
+    padding: 0 20px 40px 20px;
+  }
+  header {
+    text-align: center;
+    padding: 30px 0;
+  }
+  h1 {
+    font-size: 3em;
+    margin-bottom: 0;
+  }
+  h2 {
+    margin-top: 40px;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 10px;
+  }
+  p {
+    font-size: 1.1em;
+    max-width: 700px;
+    margin: 10px auto;
+  }
+  .icons {
+    text-align: center;
+    font-size: 50px;
+    margin: 15px 0 30px 0;
+  }
+  .icons span {
+    margin: 0 20px;
+  }
+  input, button {
+    font-family: 'Lucida Calligraphy', cursive, serif;
+    font-size: 1em;
+    padding: 8px 12px;
+    margin: 5px 0;
+    border-radius: 5px;
+    border: none;
+  }
+  input[type="file"] {
+    padding: 3px;
+  }
+  button {
+    background-color: #004d4d;
+    color: #f0f0f0;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  button:hover {
+    background-color: #006666;
+  }
+  #auth-section, #upload-section, #gallery-section {
+    max-width: 700px;
+    margin: 30px auto;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px 25px;
+    border-radius: 10px;
+  }
+  #gallery div {
+    margin-bottom: 30px;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 15px;
+  }
+  #gallery img {
+    max-width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 0 6px #004d4d;
+  }
+  #gallery p {
+    margin: 10px 0 0 0;
+    font-size: 0.9em;
+  }
+</style>
+<!-- Icons from FontAwesome CDN -->
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+/>
 </head>
 <body>
 
-  <header>
-    <h1>HoPh – The Hodophiles Club</h1>
-    <p>Wander. Discover. Connect.</p>
-    <div class="icon-row">
-      <i class="fas fa-camera-retro"></i>
-      <i class="fas fa-compass"></i>
-      <i class="fas fa-motorcycle"></i>
-    </div>
-  </header>
+<header>
+  <h1>HoPh - The Hodophiles Club</h1>
+  <div class="icons">
+    <span><i class="fas fa-camera-retro"></i></span>
+    <span><i class="fas fa-compass"></i></span>
+    <span><i class="fas fa-motorcycle"></i></span>
+  </div>
+  <p>Welcome to the community for all travel lovers! Share your journeys, stories, and photos here.</p>
+</header>
 
-  <section>
-    <h2>About the Club</h2>
-    <p>HoPh is a community for passionate wanderers – students, explorers, and dreamers – who love sharing stories, discovering new places, and connecting with fellow travel lovers.</p>
-  </section>
+<!-- Authentication Section -->
+<div id="auth-section">
+  <h2>Join HoPh - Sign Up / Log In</h2>
+  <input type="email" id="email" placeholder="Email" />
+  <input type="password" id="password" placeholder="Password" />
+  <br />
+  <button onclick="signUp()">Sign Up</button>
+  <button onclick="logIn()">Log In</button>
+  <button onclick="logOut()" style="display:none;" id="logoutBtn">Log Out</button>
+  <p id="auth-msg"></p>
+</div>
 
-  <section>
-    <h2>Join Us</h2>
-    <div class="form-box">
-      <label for="name">Enter your name:</label><br/>
-      <input type="text" id="name" placeholder="e.g., Samy" />
-      <button onclick="welcomeUser()">Join the Club</button>
-      <p id="welcome-message" style="margin-top:1rem;"></p>
-    </div>
-  </section>
+<!-- Upload Section (hidden until logged in) -->
+<div id="upload-section" style="display:none;">
+  <h2>Upload Your Travel Picture</h2>
+  <input type="file" id="photoInput" />
+  <input type="text" id="caption" placeholder="Caption" />
+  <br />
+  <button onclick="uploadPhoto()">Upload</button>
+  <p id="upload-msg"></p>
+</div>
 
-  <section>
-    <h2>Gallery</h2>
-    <div class="gallery">
-      <img src="https://source.unsplash.com/featured/?mountains" alt="Mountains">
-      <img src="https://source.unsplash.com/featured/?beach" alt="Beach">
-      <img src="https://source.unsplash.com/featured/?city" alt="City">
-    </div>
-  </section>
+<!-- Gallery Section -->
+<div id="gallery-section">
+  <h2>Travel Gallery</h2>
+  <div id="gallery"></div>
+</div>
 
-  <section>
-    <h2>Share Your Travel Dream</h2>
-    <div class="dream-box">
-      <label for="dream">What's your dream destination?</label><br/>
-      <textarea id="dream" rows="4" placeholder="Type your dream trip here..."></textarea><br/>
-      <button onclick="alert('Dream received!')">Submit</button>
-    </div>
-  </section>
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
-  <footer>
-    <p>Contact us: hodophilesclub@email.com | Instagram: @HoPhTravels</p>
-  </footer>
+<script>
+  // Your Firebase config - REPLACE with your own!
+  const firebaseConfig = {
+   
+  };
 
-  <script>
-    function welcomeUser() {
-      const name = document.getElementById("name").value;
-      const msg = document.getElementById("welcome-message");
-      if (name.trim() !== "") {
-        msg.textContent = `Welcome to the club, ${name}! 🌍`;
-      } else {
-        msg.textContent = "";
-      }
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.a// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyDvDd_P82ltR7W_njeGJbSQ9Rq2aRDcaXI",
+  authDomain: "hoph-o126.firebaseapp.com",
+  projectId: "hoph-o126",
+  storageBucket: "hoph-o126.firebasestorage.app",
+  messagingSenderId: "747851385144",
+  appId: "1:747851385144:web:1e7a4b5a63d6a04b8359cd",
+  measurementId: "G-S1D3LM6DJ8"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);uth();
+  const storage = firebase.storage();
+  const db = firebase.firestore();
+
+  // Sign Up function
+  function signUp() {
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    if (!email || !password) {
+      document.getElementById('auth-msg').textContent = "Email and password required.";
+      return;
     }
-  </script>
+    auth.createUserWithEmailAndPassword(email, password)
+      .then(() => {
+        document.getElementById('auth-msg').textContent = "Signed up successfully!";
+        toggleAuthState();
+      })
+      .catch(error => {
+        document.getElementById('auth-msg').textContent = error.message;
+      });
+  }
+
+  // Log In function
+  function logIn() {
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    if (!email || !password) {
+      document.getElementById('auth-msg').textContent = "Email and password required.";
+      return;
+    }
+    auth.signInWithEmailAndPassword(email, password)
+      .then(() => {
+        document.getElementById('auth-msg').textContent = "Logged in successfully!";
+        toggleAuthState();
+      })
+      .catch(error => {
+        document.getElementById('auth-msg').textContent = error.message;
+      });
+  }
+
+  // Log Out function
+  function logOut() {
+    auth.signOut().then(() => {
+      document.getElementById('auth-msg').textContent = "Logged out.";
+      toggleAuthState();
+    });
+  }
+
+  // Show/hide UI based on auth state
+  function toggleAuthState() {
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        document.getElementById('upload-section').style.display = 'block';
+        document.getElementById('logoutBtn').style.display = 'inline-block';
+      } else {
+        document.getElementById('upload-section').style.display = 'none';
+        document.getElementById('logoutBtn').style.display = 'none';
+      }
+    });
+  }
+
+  // Upload photo function
+  function uploadPhoto() {
+    const fileInput = document.getElementById('photoInput');
+    const file = fileInput.files[0];
+    const caption = document.getElementById('caption').value.trim();
+    if (!file) {
+      document.getElementById('upload-msg').textContent = "Please select a photo.";
+      return;
+    }
+    const user = auth.currentUser;
+    if (!user) {
+      document.getElementById('upload-msg').textContent = "You must be logged in to upload.";
+      return;
+    }
+
+    const storageRef = storage.ref('photos/' + user.uid + '/' + file.name);
+    storageRef.put(file).then(snapshot => {
+      snapshot.ref.getDownloadURL().then(url => {
+        db.collection('photos').add({
+          uid: user.uid,
+          email: user.email,
+          photoURL: url,
+          caption: caption,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(() => {
+          document.getElementById('upload-msg').textContent = "Photo uploaded successfully!";
+          fileInput.value = "";
+          document.getElementById('caption').value = "";
+          loadGallery();
+        });
+      });
+    }).catch(error => {
+      document.getElementById('upload-msg').textContent = error.message;
+    });
+  }
+
+  // Load and display gallery
+  function loadGallery() {
+    const gallery = document.getElementById('gallery');
+    gallery.innerHTML = '<p>Loading photos...</p>';
+    db.collection('photos').orderBy('timestamp', 'desc').get().then(snapshot => {
+      gallery.innerHTML = '';
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const div = document.createElement('div');
+        div.innerHTML = `
+          <img src="${data.photoURL}" alt="Travel photo" />
+          <p><strong>${data.email}</strong>: ${data.caption || ""}</p>
+        `;
+        gallery.appendChild(div);
+      });
+      if (gallery.innerHTML === '') {
+        gallery.innerHTML = '<p>No photos uploaded yet. Be the first!</p>';
+      }
+    }).catch(() => {
+      gallery.innerHTML = '<p>Failed to load photos.</p>';
+    });
+  }
+
+  window.onload = function() {
+    toggleAuthState();
+    loadGallery();
+  }
+</script>
 </body>
 </html>
