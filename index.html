@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HoPh - The Hodophiles Club</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&family=Cinzel&display=swap" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/a2d05d4f74.js" crossorigin="anonymous"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Dancing Script', cursive;
+      background-color: #e8f5f4;
+      color: #004d4d;
+    }
+
+    header {
+      background-color: #008080;
+      color: white;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+      font-family: 'Cinzel', serif;
+    }
+
+    header p {
+      font-size: 1.2rem;
+      font-style: italic;
+    }
+
+    section {
+      padding: 2rem;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .icon-row {
+      font-size: 2rem;
+      text-align: center;
+      margin: 1rem 0;
+    }
+
+    .icon-row i {
+      margin: 0 10px;
+      color: #006666;
+    }
+
+    .form-box, .dream-box {
+      background: #ffffff;
+      border: 2px dashed #008080;
+      padding: 1rem;
+      margin-top: 1rem;
+      border-radius: 10px;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+    }
+
+    .gallery img {
+      width: 100%;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      transition: transform 0.3s;
+    }
+
+    .gallery img:hover {
+      transform: scale(1.05);
+    }
+
+    footer {
+      text-align: center;
+      padding: 1rem;
+      background-color: #004d4d;
+      color: white;
+      margin-top: 3rem;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 0.5rem;
+      font-family: inherit;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      background-color: #008080;
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 0.5rem;
+    }
+
+    button:hover {
+      background-color: #006666;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>HoPh – The Hodophiles Club</h1>
+    <p>Wander. Discover. Connect.</p>
+    <div class="icon-row">
+      <i class="fas fa-camera-retro"></i>
+      <i class="fas fa-compass"></i>
+      <i class="fas fa-motorcycle"></i>
+    </div>
+  </header>
+
+  <section>
+    <h2>About the Club</h2>
+    <p>HoPh is a community for passionate wanderers – students, explorers, and dreamers – who love sharing stories, discovering new places, and connecting with fellow travel lovers.</p>
+  </section>
+
+  <section>
+    <h2>Join Us</h2>
+    <div class="form-box">
+      <label for="name">Enter your name:</label><br/>
+      <input type="text" id="name" placeholder="e.g., Samy" />
+      <button onclick="welcomeUser()">Join the Club</button>
+      <p id="welcome-message" style="margin-top:1rem;"></p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Gallery</h2>
+    <div class="gallery">
+      <img src="https://source.unsplash.com/featured/?mountains" alt="Mountains">
+      <img src="https://source.unsplash.com/featured/?beach" alt="Beach">
+      <img src="https://source.unsplash.com/featured/?city" alt="City">
+    </div>
+  </section>
+
+  <section>
+    <h2>Share Your Travel Dream</h2>
+    <div class="dream-box">
+      <label for="dream">What's your dream destination?</label><br/>
+      <textarea id="dream" rows="4" placeholder="Type your dream trip here..."></textarea><br/>
+      <button onclick="alert('Dream received!')">Submit</button>
+    </div>
+  </section>
+
+  <footer>
+    <p>Contact us: hodophilesclub@email.com | Instagram: @HoPhTravels</p>
+  </footer>
+
+  <script>
+    function welcomeUser() {
+      const name = document.getElementById("name").value;
+      const msg = document.getElementById("welcome-message");
+      if (name.trim() !== "") {
+        msg.textContent = `Welcome to the club, ${name}! 🌍`;
+      } else {
+        msg.textContent = "";
+      }
+    }
+  </script>
+</body>
+</html>
