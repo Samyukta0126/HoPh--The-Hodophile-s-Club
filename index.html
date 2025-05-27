@@ -104,9 +104,9 @@
   <input type="email" id="email" placeholder="Email" />
   <input type="password" id="password" placeholder="Password" />
   <br />
-  <button onclick="signUp()">Sign Up</button>
-  <button onclick="logIn()">Log In</button>
-  <button onclick="logOut()" style="display:none;" id="logoutBtn">Log Out</button>
+  <button id="signUpBtn">Sign Up</button>
+  <button id="logInBtn">Log In</button>
+  <button id="logoutBtn" style="display:none;">Log Out</button>
   <p id="auth-msg"></p>
 </div>
 
@@ -116,14 +116,14 @@
   <input type="file" id="photoInput" />
   <input type="text" id="caption" placeholder="Caption" />
   <br />
-  <button onclick="uploadPhoto()">Upload</button>
+  <button id="uploadBtn">Upload</button>
   <p id="upload-msg"></p>
 </div>
 
 <!-- Gallery Section -->
 <div id="gallery-section">
   <h2>Travel Gallery</h2>
-  <div id="gallery"></div>
+  <div id="gallery"><p>Loading photos...</p></div>
 </div>
 
 <!-- Firebase SDKs -->
@@ -133,7 +133,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
 <script>
-  // Your Firebase config
+  // Your Firebase config - replace with your own!
   const firebaseConfig = {
     apiKey: "AIzaSyDvDd_P82ltR7W_njeGJbSQ9Rq2aRDcaXI",
     authDomain: "hoph-o126.firebaseapp.com",
@@ -146,54 +146,65 @@
 
   // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
-
   const auth = firebase.auth();
   const storage = firebase.storage();
   const db = firebase.firestore();
 
+  const authMsg = document.getElementById('auth-msg');
+  const uploadMsg = document.getElementById('upload-msg');
+
+  // Clear messages
+  function clearMessages() {
+    authMsg.textContent = '';
+    uploadMsg.textContent = '';
+  }
+
   // Sign Up function
-  function signUp() {
+  document.getElementById('signUpBtn').addEventListener('click', () => {
+    clearMessages();
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
     if (!email || !password) {
-      document.getElementById('auth-msg').textContent = "Email and password required.";
+      authMsg.textContent = "Email and password required.";
       return;
     }
     auth.createUserWithEmailAndPassword(email, password)
       .then(() => {
-        document.getElementById('auth-msg').textContent = "Signed up successfully!";
+        authMsg.textContent = "Signed up successfully! You are now logged in.";
         toggleAuthState();
       })
       .catch(error => {
-        document.getElementById('auth-msg').textContent = error.message;
+        authMsg.textContent = "Sign Up Error: " + error.message;
       });
-  }
+  });
 
   // Log In function
-  function logIn() {
+  document.getElementById('logInBtn').addEventListener('click', () => {
+    clearMessages();
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
     if (!email || !password) {
-      document.getElementById('auth-msg').textContent = "Email and password required.";
+      authMsg.textContent = "Email and password required.";
       return;
     }
     auth.signInWithEmailAndPassword(email, password)
       .then(() => {
-        document.getElementById('auth-msg').textContent = "Logged in successfully!";
+        authMsg.textContent = "Logged in successfully!";
         toggleAuthState();
       })
       .catch(error => {
-        document.getElementById('auth-msg').textContent = error.message;
+        authMsg.textContent = "Login Error: " + error.message;
       });
-  }
+  });
 
   // Log Out function
-  function logOut() {
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    clearMessages();
     auth.signOut().then(() => {
-      document.getElementById('auth-msg').textContent = "Logged out.";
+      authMsg.textContent = "Logged out.";
       toggleAuthState();
     });
-  }
+  });
 
   // Show/hide UI based on auth state
   function toggleAuthState() {
@@ -201,77 +212,102 @@
       if (user) {
         document.getElementById('upload-section').style.display = 'block';
         document.getElementById('logoutBtn').style.display = 'inline-block';
-        document.getElementById('auth-msg').textContent = `Welcome, ${user.email}`;
+        document.getElementById('signUpBtn').style.display = 'none';
+        document.getElementById('logInBtn').style.display = 'none';
+        document.getElementById('email').style.display = 'none';
+        document.getElementById('password').style.display = 'none';
       } else {
         document.getElementById('upload-section').style.display = 'none';
         document.getElementById('logoutBtn').style.display = 'none';
-        document.getElementById('auth-msg').textContent = '';
+        document.getElementById('signUpBtn').style.display = 'inline-block';
+        document.getElementById('logInBtn').style.display = 'inline-block';
+        document.getElementById('email').style.display = 'inline-block';
+        document.getElementById('password').style.display = 'inline-block';
       }
     });
   }
 
   // Upload photo function
-  function uploadPhoto() {
+  document.getElementById('uploadBtn').addEventListener('click', () => {
+    clearMessages();
     const fileInput = document.getElementById('photoInput');
     const file = fileInput.files[0];
     const caption = document.getElementById('caption').value.trim();
     if (!file) {
-      document.getElementById('upload-msg').textContent = "Please select a photo.";
+      uploadMsg.textContent = "Please select a photo.";
       return;
     }
     const user = auth.currentUser;
     if (!user) {
-      document.getElementById('upload-msg').textContent = "You must be logged in to upload.";
+      uploadMsg.textContent = "You must be logged in to upload.";
       return;
     }
 
-    const storageRef = storage.ref('photos/' + user.uid + '/' + file.name);
-    storageRef.put(file).then(snapshot => {
-      snapshot.ref.getDownloadURL().then(url => {
-        db.collection('photos').add({
-          uid: user.uid,
-          email: user.email,
-          photoURL: url,
-          caption: caption,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        }).then(() => {
-          document.getElementById('upload-msg').textContent = "Photo uploaded successfully!";
-          fileInput.value = "";
-          document.getElementById('caption').value = "";
-          loadGallery();
-        });
-      });
-    }).catch(error => {
-      document.getElementById('upload-msg').textContent = error.message;
-    });
-  }
+    const storageRef = storage.ref();
+    const photoRef = storageRef.child('photos/' + user.uid + '/' + Date.now() + '_' + file.name);
+    const uploadTask = photoRef.put(file);
 
-  // Load and display gallery
+    uploadMsg.textContent = "Uploading...";
+
+    uploadTask.on('state_changed', 
+      snapshot => {
+        // Progress can be tracked here if needed
+      },
+      error => {
+        uploadMsg.textContent = "Upload failed: " + error.message;
+      },
+      () => {
+        uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
+          // Save photo info in Firestore
+          db.collection('photos').add({
+            uid: user.uid,
+            email: user.email,
+            url: downloadURL,
+            caption: caption,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+          })
+          .then(() => {
+            uploadMsg.textContent = "Upload successful!";
+            fileInput.value = '';
+            document.getElementById('caption').value = '';
+            loadGallery();
+          })
+          .catch(error => {
+            uploadMsg.textContent = "Error saving to database: " + error.message;
+          });
+        });
+      }
+    );
+  });
+
+  // Load photos from Firestore and display gallery
   function loadGallery() {
     const gallery = document.getElementById('gallery');
     gallery.innerHTML = '<p>Loading photos...</p>';
-    db.collection('photos').orderBy('timestamp', 'desc').get().then(snapshot => {
-      gallery.innerHTML = '';
-      if (snapshot.empty) {
-        gallery.innerHTML = '<p>No photos uploaded yet. Be the first!</p>';
-        return;
-      }
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        const div = document.createElement('div');
-        div.innerHTML = `
-          <img src="${data.photoURL}" alt="Travel photo" />
-          <p><strong>${data.email}</strong>: ${data.caption || ""}</p>
-        `;
-        gallery.appendChild(div);
+    db.collection('photos').orderBy('timestamp', 'desc').limit(20).get()
+      .then(snapshot => {
+        if (snapshot.empty) {
+          gallery.innerHTML = '<p>No photos uploaded yet.</p>';
+          return;
+        }
+        gallery.innerHTML = '';
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          const div = document.createElement('div');
+          div.innerHTML = `
+            <img src="${data.url}" alt="Travel photo" />
+            <p><strong>${data.email}</strong>: ${data.caption || ''}</p>
+          `;
+          gallery.appendChild(div);
+        });
+      })
+      .catch(error => {
+        gallery.innerHTML = `<p>Error loading photos: ${error.message}</p>`;
       });
-    }).catch(() => {
-      gallery.innerHTML = '<p>Failed to load photos.</p>';
-    });
   }
 
-  // Initialize on page load
-  window.onload = function() {
+  // Initialize UI and gallery on page load
+  window.onload = () => {
     toggleAuthState();
     loadGallery();
   };
