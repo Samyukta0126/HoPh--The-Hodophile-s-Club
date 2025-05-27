@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>HoPh - The Hodophiles Club</title>
   <style>
-    /* Your existing styling here, keep it as is */
     body {
       background-color: #008080;
       font-family: 'Lucida Calligraphy', cursive, serif;
@@ -39,19 +38,24 @@
     .icons span {
       margin: 0 20px;
     }
-    input, button {
+    input, textarea, button {
       font-family: 'Lucida Calligraphy', cursive, serif;
       font-size: 1em;
       padding: 8px 12px;
       margin: 5px 0;
       border-radius: 5px;
       border: none;
+      width: 100%;
+      box-sizing: border-box;
     }
     button {
       background-color: #004d4d;
       color: #f0f0f0;
       cursor: pointer;
       transition: background-color 0.3s ease;
+      width: auto;
+      padding: 8px 20px;
+      margin-right: 10px;
     }
     button:hover {
       background-color: #006666;
@@ -78,6 +82,8 @@
       font-size: 0.8em;
       padding: 5px 10px;
       border-radius: 5px;
+      cursor: pointer;
+      border: none;
     }
     .delete-btn:hover {
       background-color: #d9534f;
@@ -104,19 +110,19 @@
 <!-- Authentication Section -->
 <div id="auth-section">
   <h2>Join HoPh - Sign Up / Log In</h2>
-  <input type="text" id="name" placeholder="Enter your name" />
-  <br />
-  <button onclick="signUp()">Sign Up</button>
-  <button onclick="logIn()">Log In</button>
-  <button onclick="logOut()" style="display:none;" id="logoutBtn">Log Out</button>
+  <input type="text" id="name" placeholder="Enter your name" autocomplete="off" />
+  <div style="margin-top:10px;">
+    <button onclick="signUp()">Sign Up</button>
+    <button onclick="logIn()">Log In</button>
+    <button onclick="logOut()" style="display:none;" id="logoutBtn">Log Out</button>
+  </div>
   <p id="auth-msg"></p>
 </div>
 
 <!-- Dream Submission Section -->
 <div id="dream-section" style="display:none;">
   <h2>Share Your Travel Dream</h2>
-  <textarea id="travelDream" placeholder="What's your travel dream?" rows="4" style="width:100%; font-family:'Lucida Calligraphy', cursive;"></textarea>
-  <br />
+  <textarea id="travelDream" placeholder="What's your travel dream?" rows="4"></textarea>
   <button onclick="postDream()">Post Dream</button>
   <p id="post-msg"></p>
 </div>
@@ -133,7 +139,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
 <script>
-  // Your Firebase config (replace with your actual config)
+  // Replace these values with your Firebase config
   const firebaseConfig = {
     apiKey: "YOUR_API_KEY",
     authDomain: "YOUR_AUTH_DOMAIN",
@@ -143,65 +149,62 @@
     appId: "YOUR_APP_ID"
   };
 
-  // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
   const db = firebase.firestore();
 
-  // Sign Up function - create user with name as displayName (email-less)
+  // SIGN UP FUNCTION
   function signUp() {
     const name = document.getElementById('name').value.trim();
     if (!name) {
       document.getElementById('auth-msg').textContent = "Please enter your name.";
       return;
     }
-    // Using anonymous auth but we will set displayName in Firestore user doc instead
     auth.signInAnonymously()
       .then(() => {
         const user = auth.currentUser;
-        // Save user name in Firestore users collection keyed by uid
-        return db.collection('users').doc(user.uid).set({ name: name });
-      })
-      .then(() => {
-        document.getElementById('auth-msg').textContent = "Signed up successfully!";
-        toggleAuthState();
+        return db.collection('users').doc(user.uid).set({ name: name })
+          .then(() => {
+            // Save to sessionStorage
+            sessionStorage.setItem('userUID', user.uid);
+            sessionStorage.setItem('userName', name);
+            document.getElementById('auth-msg').textContent = "Signed up successfully!";
+            toggleAuthState();
+          });
       })
       .catch(error => {
         document.getElementById('auth-msg').textContent = error.message;
       });
   }
 
-  // Log In function - user enters name, we check users collection for match and sign in anonymously with same uid
+  // LOG IN FUNCTION
   function logIn() {
     const name = document.getElementById('name').value.trim();
     if (!name) {
       document.getElementById('auth-msg').textContent = "Please enter your name.";
       return;
     }
-    // Fetch all users and find uid with matching name
     db.collection('users').where('name', '==', name).get()
       .then(snapshot => {
         if (snapshot.empty) {
           document.getElementById('auth-msg').textContent = "Name not found, please sign up first.";
-        } else {
-          const userDoc = snapshot.docs[0];
-          // Log in anonymously and pretend this is the user (Firebase anonymous auth doesn't support uid setting,
-          // So this is just a demo to let user post dreams — in real app, use proper auth)
-          return auth.signInAnonymously().then(() => {
-            // Save the uid in sessionStorage for referencing user's name later
+          return;
+        }
+        const userDoc = snapshot.docs[0];
+        auth.signInAnonymously()
+          .then(() => {
             sessionStorage.setItem('userUID', userDoc.id);
             sessionStorage.setItem('userName', name);
             document.getElementById('auth-msg').textContent = "Logged in successfully!";
             toggleAuthState();
           });
-        }
       })
       .catch(error => {
         document.getElementById('auth-msg').textContent = error.message;
       });
   }
 
-  // Log Out function
+  // LOG OUT FUNCTION
   function logOut() {
     auth.signOut().then(() => {
       sessionStorage.clear();
@@ -210,7 +213,7 @@
     });
   }
 
-  // Toggle UI on auth state
+  // TOGGLE UI BASED ON AUTH STATE
   function toggleAuthState() {
     const userUID = sessionStorage.getItem('userUID');
     const userName = sessionStorage.getItem('userName');
@@ -226,7 +229,7 @@
     loadDreams();
   }
 
-  // Post a travel dream
+  // POST A DREAM
   function postDream() {
     const dreamText = document.getElementById('travelDream').value.trim();
     const userUID = sessionStorage.getItem('userUID');
@@ -257,7 +260,7 @@
     });
   }
 
-  // Load all travel dreams and show delete button for user's own dreams
+  // LOAD ALL DREAMS
   function loadDreams() {
     const dreamsDiv = document.getElementById('dreams');
     const userUID = sessionStorage.getItem('userUID');
@@ -269,63 +272,12 @@
           return;
         }
 
-        dreamsDiv.innerHTML = ''; // clear previous
+        dreamsDiv.innerHTML = '';
 
         snapshot.forEach(doc => {
           const data = doc.data();
           const dreamId = doc.id;
-          const name = data.name || 'Anonymous';
-          const dream = data.dream || '';
-          const isOwner = userUID === data.uid;
-
-          const dreamEl = document.createElement('div');
-
-          let html = `<strong>${name}</strong> says:<br><p>${dream}</p>`;
-          if (isOwner) {
-            html += `<button class="delete-btn" onclick="deleteDream('${dreamId}')">Delete</button>`;
-          }
-          dreamEl.innerHTML = html;
-
-          dreamsDiv.appendChild(dreamEl);
-        });
-      })
-      .catch(error => {
-        dreamsDiv.innerHTML = `<p>Error loading dreams: ${error.message}</p>`;
-      });
-  }
-
-  // Delete a travel dream (only if owner)
-  function deleteDream(dreamId) {
-    const userUID = sessionStorage.getItem('userUID');
-
-    db.collection('travelDreams').doc(dreamId).get()
-      .then(doc => {
-        if (!doc.exists) {
-          alert("Dream not found!");
-          return;
-        }
-        if (doc.data().uid !== userUID) {
-          alert("You can only delete your own travel dreams.");
-          return;
-        }
-        return db.collection('travelDreams').doc(dreamId).delete();
-      })
-      .then(() => {
-        loadDreams();
-      })
-      .catch(error => {
-        alert("Error deleting dream: " + error.message);
-      });
-  }
-
-  // On page load, toggle auth state to setup UI
-  window.onload = () => {
-    toggleAuthState();
-  };
-</script>
-
-</body>
-</html>
+          const name =
 
     
 
