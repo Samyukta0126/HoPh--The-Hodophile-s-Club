@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>HoPh - The Hodophiles Club</title>
   <style>
+    /* Your existing styling here, keep it as is */
     body {
       background-color: #008080;
       font-family: 'Lucida Calligraphy', cursive, serif;
@@ -30,7 +31,15 @@
       max-width: 700px;
       margin: 10px auto;
     }
-    input, button, textarea {
+    .icons {
+      text-align: center;
+      font-size: 50px;
+      margin: 15px 0 30px 0;
+    }
+    .icons span {
+      margin: 0 20px;
+    }
+    input, button {
       font-family: 'Lucida Calligraphy', cursive, serif;
       font-size: 1em;
       padding: 8px 12px;
@@ -47,155 +56,280 @@
     button:hover {
       background-color: #006666;
     }
-    #auth-section, #dream-section, #community-section {
+    #auth-section, #dream-section {
       max-width: 700px;
       margin: 30px auto;
       background: rgba(255, 255, 255, 0.1);
       padding: 20px 25px;
       border-radius: 10px;
     }
-    #community-section div {
+    #dreams div {
       margin-bottom: 30px;
       border-bottom: 1px solid #f0f0f0;
       padding-bottom: 15px;
     }
-    #community-section p {
-      margin: 5px 0 0 0;
-      font-size: 1.1em;
+    #dreams p {
+      margin: 10px 0 0 0;
+      font-size: 0.9em;
+    }
+    .delete-btn {
+      background-color: #a83232;
+      margin-top: 8px;
+      font-size: 0.8em;
+      padding: 5px 10px;
+      border-radius: 5px;
+    }
+    .delete-btn:hover {
+      background-color: #d9534f;
     }
   </style>
+  <!-- FontAwesome icons CDN -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
 </head>
 <body>
 
 <header>
   <h1>HoPh - The Hodophiles Club</h1>
-  <p>Welcome travelers! Join to share your travel dreams and see what inspires others.</p>
+  <div class="icons">
+    <span><i class="fas fa-camera-retro"></i></span>
+    <span><i class="fas fa-compass"></i></span>
+    <span><i class="fas fa-motorcycle"></i></span>
+  </div>
+  <p>Welcome to the community for all travel lovers! Share your travel dreams here.</p>
 </header>
 
-<!-- Login Section -->
+<!-- Authentication Section -->
 <div id="auth-section">
-  <h2>Join HoPh</h2>
-  <input type="text" id="username" placeholder="Enter your name" />
+  <h2>Join HoPh - Sign Up / Log In</h2>
+  <input type="text" id="name" placeholder="Enter your name" />
   <br />
-  <button onclick="logIn()">Enter</button>
+  <button onclick="signUp()">Sign Up</button>
+  <button onclick="logIn()">Log In</button>
   <button onclick="logOut()" style="display:none;" id="logoutBtn">Log Out</button>
   <p id="auth-msg"></p>
 </div>
 
-<!-- Share Dream Section -->
+<!-- Dream Submission Section -->
 <div id="dream-section" style="display:none;">
   <h2>Share Your Travel Dream</h2>
-  <textarea id="travelDream" rows="3" placeholder="What inspires your travel dreams?"></textarea>
+  <textarea id="travelDream" placeholder="What's your travel dream?" rows="4" style="width:100%; font-family:'Lucida Calligraphy', cursive;"></textarea>
   <br />
-  <button onclick="postDream()">Post</button>
+  <button onclick="postDream()">Post Dream</button>
   <p id="post-msg"></p>
 </div>
 
-<!-- Community Wall -->
-<div id="community-section">
+<!-- Display all dreams -->
+<div id="dream-list" style="max-width:700px; margin: 30px auto; background: rgba(255,255,255,0.1); padding: 20px 25px; border-radius: 10px;">
   <h2>Community Travel Dreams</h2>
-  <div id="dreamsList">
-    <p>Loading dreams...</p>
-  </div>
+  <div id="dreams">Loading dreams...</div>
 </div>
 
+<!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
 <script>
-  // Firebase config - REPLACE with your own config from Firebase Console
+  // Your Firebase config (replace with your actual config)
   const firebaseConfig = {
-    apiKey: "AIzaSyDvDd_P82ltR7W_njeGJbSQ9Rq2aRDcaXI",
-    authDomain: "hoph-o126.firebaseapp.com",
-    projectId: "hoph-o126",
-    storageBucket: "hoph-o126.appspot.com",
-    messagingSenderId: "747851385144",
-    appId: "1:747851385144:web:1e7a4b5a63d6a04b8359cd",
-    measurementId: "G-S1D3LM6DJ8"
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_STORAGE_BUCKET",
+    messagingSenderId: "YOUR_MSG_SENDER_ID",
+    appId: "YOUR_APP_ID"
   };
 
+  // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
   const db = firebase.firestore();
 
-  let currentUser = null;
-
-  function logIn() {
-    const username = document.getElementById('username').value.trim();
-    if (!username) {
+  // Sign Up function - create user with name as displayName (email-less)
+  function signUp() {
+    const name = document.getElementById('name').value.trim();
+    if (!name) {
       document.getElementById('auth-msg').textContent = "Please enter your name.";
       return;
     }
-    currentUser = username;
-    document.getElementById('auth-msg').textContent = "Welcome, " + currentUser + "!";
-    document.getElementById('auth-section').style.display = 'none';
-    document.getElementById('dream-section').style.display = 'block';
-    document.getElementById('logoutBtn').style.display = 'inline-block';
-  }
-
-  function logOut() {
-    currentUser = null;
-    document.getElementById('auth-msg').textContent = "";
-    document.getElementById('username').value = "";
-    document.getElementById('dream-section').style.display = 'none';
-    document.getElementById('auth-section').style.display = 'block';
-    document.getElementById('logoutBtn').style.display = 'none';
-  }
-
-  function postDream() {
-    const dream = document.getElementById('travelDream').value.trim();
-    if (!currentUser) {
-      alert("Please login first.");
-      return;
-    }
-    if (!dream) {
-      document.getElementById('post-msg').textContent = "Please enter your travel dream.";
-      return;
-    }
-    db.collection("travelDreams").add({
-      name: currentUser,
-      dream: dream,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(() => {
-      document.getElementById('post-msg').textContent = "Dream posted!";
-      document.getElementById('travelDream').value = "";
-      loadDreams();
-    }).catch((error) => {
-      document.getElementById('post-msg').textContent = "Error: " + error.message;
-    });
-  }
-
-  function loadDreams() {
-    const dreamsList = document.getElementById('dreamsList');
-    dreamsList.innerHTML = '<p>Loading dreams...</p>';
-    db.collection("travelDreams")
-      .orderBy("timestamp", "desc")
-      .get()
-      .then(querySnapshot => {
-        if (querySnapshot.empty) {
-          dreamsList.innerHTML = "<p>No travel dreams posted yet. Be the first!</p>";
-          return;
-        }
-        dreamsList.innerHTML = "";
-        querySnapshot.forEach(doc => {
-          const data = doc.data();
-          const div = document.createElement('div');
-          div.innerHTML = `<strong>${data.name}</strong><p>${data.dream}</p>`;
-          dreamsList.appendChild(div);
-        });
+    // Using anonymous auth but we will set displayName in Firestore user doc instead
+    auth.signInAnonymously()
+      .then(() => {
+        const user = auth.currentUser;
+        // Save user name in Firestore users collection keyed by uid
+        return db.collection('users').doc(user.uid).set({ name: name });
       })
-      .catch(() => {
-        dreamsList.innerHTML = "<p>Failed to load dreams.</p>";
+      .then(() => {
+        document.getElementById('auth-msg').textContent = "Signed up successfully!";
+        toggleAuthState();
+      })
+      .catch(error => {
+        document.getElementById('auth-msg').textContent = error.message;
       });
   }
 
-  // Load community dreams on page load
-  window.onload = () => {
+  // Log In function - user enters name, we check users collection for match and sign in anonymously with same uid
+  function logIn() {
+    const name = document.getElementById('name').value.trim();
+    if (!name) {
+      document.getElementById('auth-msg').textContent = "Please enter your name.";
+      return;
+    }
+    // Fetch all users and find uid with matching name
+    db.collection('users').where('name', '==', name).get()
+      .then(snapshot => {
+        if (snapshot.empty) {
+          document.getElementById('auth-msg').textContent = "Name not found, please sign up first.";
+        } else {
+          const userDoc = snapshot.docs[0];
+          // Log in anonymously and pretend this is the user (Firebase anonymous auth doesn't support uid setting,
+          // So this is just a demo to let user post dreams — in real app, use proper auth)
+          return auth.signInAnonymously().then(() => {
+            // Save the uid in sessionStorage for referencing user's name later
+            sessionStorage.setItem('userUID', userDoc.id);
+            sessionStorage.setItem('userName', name);
+            document.getElementById('auth-msg').textContent = "Logged in successfully!";
+            toggleAuthState();
+          });
+        }
+      })
+      .catch(error => {
+        document.getElementById('auth-msg').textContent = error.message;
+      });
+  }
+
+  // Log Out function
+  function logOut() {
+    auth.signOut().then(() => {
+      sessionStorage.clear();
+      document.getElementById('auth-msg').textContent = "Logged out.";
+      toggleAuthState();
+    });
+  }
+
+  // Toggle UI on auth state
+  function toggleAuthState() {
+    const userUID = sessionStorage.getItem('userUID');
+    const userName = sessionStorage.getItem('userName');
+    if (userUID && userName) {
+      document.getElementById('dream-section').style.display = 'block';
+      document.getElementById('logoutBtn').style.display = 'inline-block';
+      document.getElementById('auth-msg').textContent = `Hello, ${userName}!`;
+    } else {
+      document.getElementById('dream-section').style.display = 'none';
+      document.getElementById('logoutBtn').style.display = 'none';
+      document.getElementById('auth-msg').textContent = '';
+    }
     loadDreams();
+  }
+
+  // Post a travel dream
+  function postDream() {
+    const dreamText = document.getElementById('travelDream').value.trim();
+    const userUID = sessionStorage.getItem('userUID');
+    const userName = sessionStorage.getItem('userName');
+
+    if (!dreamText) {
+      document.getElementById('post-msg').textContent = "Please write your travel dream.";
+      return;
+    }
+    if (!userUID || !userName) {
+      document.getElementById('post-msg').textContent = "Please log in first.";
+      return;
+    }
+
+    db.collection('travelDreams').add({
+      uid: userUID,
+      name: userName,
+      dream: dreamText,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    })
+    .then(() => {
+      document.getElementById('travelDream').value = '';
+      document.getElementById('post-msg').textContent = "Dream posted!";
+      loadDreams();
+    })
+    .catch(error => {
+      document.getElementById('post-msg').textContent = error.message;
+    });
+  }
+
+  // Load all travel dreams and show delete button for user's own dreams
+  function loadDreams() {
+    const dreamsDiv = document.getElementById('dreams');
+    const userUID = sessionStorage.getItem('userUID');
+
+    db.collection('travelDreams').orderBy('timestamp', 'desc').get()
+      .then(snapshot => {
+        if (snapshot.empty) {
+          dreamsDiv.innerHTML = "<p>No travel dreams posted yet. Be the first!</p>";
+          return;
+        }
+
+        dreamsDiv.innerHTML = ''; // clear previous
+
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          const dreamId = doc.id;
+          const name = data.name || 'Anonymous';
+          const dream = data.dream || '';
+          const isOwner = userUID === data.uid;
+
+          const dreamEl = document.createElement('div');
+
+          let html = `<strong>${name}</strong> says:<br><p>${dream}</p>`;
+          if (isOwner) {
+            html += `<button class="delete-btn" onclick="deleteDream('${dreamId}')">Delete</button>`;
+          }
+          dreamEl.innerHTML = html;
+
+          dreamsDiv.appendChild(dreamEl);
+        });
+      })
+      .catch(error => {
+        dreamsDiv.innerHTML = `<p>Error loading dreams: ${error.message}</p>`;
+      });
+  }
+
+  // Delete a travel dream (only if owner)
+  function deleteDream(dreamId) {
+    const userUID = sessionStorage.getItem('userUID');
+
+    db.collection('travelDreams').doc(dreamId).get()
+      .then(doc => {
+        if (!doc.exists) {
+          alert("Dream not found!");
+          return;
+        }
+        if (doc.data().uid !== userUID) {
+          alert("You can only delete your own travel dreams.");
+          return;
+        }
+        return db.collection('travelDreams').doc(dreamId).delete();
+      })
+      .then(() => {
+        loadDreams();
+      })
+      .catch(error => {
+        alert("Error deleting dream: " + error.message);
+      });
+  }
+
+  // On page load, toggle auth state to setup UI
+  window.onload = () => {
+    toggleAuthState();
   };
 </script>
 
 </body>
 </html>
+
+    
+
+
 
  
 
