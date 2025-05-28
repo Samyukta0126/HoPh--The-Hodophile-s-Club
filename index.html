@@ -1,228 +1,199 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>HoPh - The Hodophiles Club</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <style>
-    body {
-      background-color: #008080;
-      font-family: 'Lucida Calligraphy', cursive;
-      color: #fff;
-      margin: 0;
-      padding: 0 20px 40px;
-    }
-    header {
-      text-align: center;
-      padding: 30px 0;
-    }
-    h1 {
-      font-size: 3em;
-    }
-    .icons span {
-      font-size: 40px;
-      margin: 0 15px;
-    }
-    #auth-section, #dream-section, #dream-list {
-      max-width: 700px;
-      margin: 30px auto;
-      background: rgba(255, 255, 255, 0.1);
-      padding: 20px;
-      border-radius: 10px;
-    }
-    input, textarea, button {
-      font-family: 'Lucida Calligraphy', cursive;
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      border: none;
-      border-radius: 5px;
-    }
-    button {
-      background-color: #004d4d;
-      color: white;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #006666;
-    }
-    .delete-btn {
-      background-color: #a83232;
-      margin-top: 8px;
-      font-size: 0.9em;
-    }
-    .delete-btn:hover {
-      background-color: #d9534f;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>HoPh - The Hodophiles Club</title>
+
+<!-- Firebase SDKs (compat version) -->
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+
+<style>
+  body {
+    background-color: #008080; /* teal */
+    color: #fff;
+    font-family: 'Georgia', serif;
+    margin: 0;
+    padding: 0 20px;
+  }
+  h1, h2 {
+    font-family: 'Brush Script MT', cursive;
+  }
+  .container {
+    max-width: 700px;
+    margin: 30px auto;
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  label, input, textarea, button {
+    display: block;
+    width: 100%;
+    margin-bottom: 15px;
+  }
+  input, textarea {
+    font-family: 'Georgia', serif;
+    font-size: 1.1em;
+    padding: 8px;
+    border-radius: 6px;
+    border: none;
+  }
+  button {
+    background-color: #004d4d;
+    color: white;
+    font-weight: bold;
+    padding: 12px;
+    border: none;
+    cursor: pointer;
+    border-radius: 8px;
+  }
+  button:hover {
+    background-color: #006666;
+  }
+  .dream {
+    background: rgba(255,255,255,0.15);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+  .dream .name {
+    font-weight: bold;
+    font-size: 1.2em;
+  }
+  .wanderlust-section {
+    margin-top: 40px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .wanderlust-section ul {
+    list-style-type: none;
+    padding-left: 0;
+  }
+  .wanderlust-section li {
+    margin-bottom: 8px;
+  }
+  .travel-icon {
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+</style>
 </head>
 <body>
 
-<header>
-  <h1>HoPh - The Hodophiles Club</h1>
-  <div class="icons">
-    <span><i class="fas fa-plane"></i></span>
-    <span><i class="fas fa-compass"></i></span>
-    <span><i class="fas fa-globe"></i></span>
+<div class="container">
+  <h1>Welcome to HoPh - The Hodophiles Club</h1>
+
+  <label for="nameInput">Enter your name:</label>
+  <input type="text" id="nameInput" placeholder="Your name..." />
+
+  <label for="dreamInput">Share your travel dream:</label>
+  <textarea id="dreamInput" rows="3" placeholder="Describe your dream destination or trip..."></textarea>
+
+  <button id="submitBtn">Share Dream</button>
+
+  <h2>Travel Dreams from Fellow Hodophiles</h2>
+  <div id="dreamsList">
+    <!-- Posted dreams will appear here -->
   </div>
-  <p>Welcome! Share your travel dreams and connect with fellow explorers.</p>
-</header>
 
-<div id="auth-section">
-  <h2>Join the Community</h2>
-  <input type="text" id="name" placeholder="Enter your name" />
-  <button onclick="signUp()">Sign Up</button>
-  <button onclick="logIn()">Log In</button>
-  <button id="logoutBtn" onclick="logOut()" style="display:none;">Log Out</button>
-  <p id="auth-msg"></p>
+  <div class="wanderlust-section">
+    <h2>Spark Your Wanderlust</h2>
+
+    <h3>Recommended Travel Books</h3>
+    <ul>
+      <li>✈️ <em>“On the Road”</em> by Jack Kerouac</li>
+      <li>🌍 <em>“Into the Wild”</em> by Jon Krakauer</li>
+      <li>📚 <em>“Vagabonding”</em> by Rolf Potts</li>
+      <li>📖 <em>“The Alchemist”</em> by Paulo Coelho</li>
+    </ul>
+
+    <h3>Famous Travel Destinations</h3>
+    <ul>
+      <li>🏝️ Bali, Indonesia</li>
+      <li>🏰 Paris, France</li>
+      <li>🗻 Kyoto, Japan</li>
+      <li>🏜️ Cappadocia, Turkey</li>
+      <li>🏛️ Rome, Italy</li>
+    </ul>
+  </div>
 </div>
 
-<div id="dream-section" style="display:none;">
-  <h2>Your Travel Dream</h2>
-  <textarea id="travelDream" rows="3" placeholder="Describe your dream destination..."></textarea>
-  <button onclick="postDream()">Post Dream</button>
-  <p id="post-msg"></p>
-</div>
-
-<div id="dream-list">
-  <h2>Community Travel Dreams</h2>
-  <div id="dreams">Loading...</div>
-</div>
-
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 <script>
+  // Your Firebase config
   const firebaseConfig = {
     apiKey: "AIzaSyA_yOkPi4W9mPveWzj6oxPqeBmW9fQ4kM0",
     authDomain: "hoph-community.firebaseapp.com",
     projectId: "hoph-community",
     storageBucket: "hoph-community.appspot.com",
     messagingSenderId: "71106622256",
-    appId: "1:71106622256:web:9a5e8607a6e06af4394ef5"
+    appId: "1:71106622256:web:9a5e8607a6e06af4394ef5",
+    measurementId: "G-YV8C1HZWCE"
   };
+
+  // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
   const db = firebase.firestore();
 
-  function signUp() {
-    const name = document.getElementById('name').value.trim();
-    if (!name) return alert("Please enter your name.");
-    auth.signInAnonymously()
-      .then(() => db.collection('users').doc(auth.currentUser.uid).set({ name }))
-      .then(() => {
-        sessionStorage.setItem('userUID', auth.currentUser.uid);
-        sessionStorage.setItem('userName', name);
-        toggleAuthState();
-      })
-      .catch(e => alert(e.message));
-  }
+  const nameInput = document.getElementById('nameInput');
+  const dreamInput = document.getElementById('dreamInput');
+  const submitBtn = document.getElementById('submitBtn');
+  const dreamsList = document.getElementById('dreamsList');
 
-  function logIn() {
-    const name = document.getElementById('name').value.trim();
-    if (!name) return alert("Please enter your name.");
-    db.collection('users').where('name', '==', name).get()
-      .then(snapshot => {
-        if (snapshot.empty) return alert("Name not found, please sign up first.");
-        const userDoc = snapshot.docs[0];
-        return auth.signInAnonymously().then(() => {
-          sessionStorage.setItem('userUID', userDoc.id);
-          sessionStorage.setItem('userName', name);
-          toggleAuthState();
-        });
-      })
-      .catch(e => alert(e.message));
-  }
+  // Add a new travel dream to Firestore
+  submitBtn.onclick = async () => {
+    const name = nameInput.value.trim();
+    const dream = dreamInput.value.trim();
+    if (!name) {
+      alert("Please enter your name.");
+      return;
+    }
+    if (!dream) {
+      alert("Please write your travel dream.");
+      return;
+    }
 
-  function logOut() {
-    auth.signOut().then(() => {
-      sessionStorage.clear();
-      toggleAuthState();
+    try {
+      await db.collection("travelDreams").add({
+        name,
+        dream,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      dreamInput.value = "";
+    } catch (error) {
+      alert("Error posting dream: " + error.message);
+    }
+  };
+
+  // Real-time listener to display dreams
+  db.collection("travelDreams")
+    .orderBy("timestamp", "desc")
+    .onSnapshot((snapshot) => {
+      dreamsList.innerHTML = "";
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        const div = document.createElement("div");
+        div.className = "dream";
+        div.innerHTML = `<div class="name">🧳 ${escapeHtml(data.name)}</div>
+                         <div class="text">${escapeHtml(data.dream)}</div>`;
+        dreamsList.appendChild(div);
+      });
+    });
+
+  // Basic HTML escaping to prevent injection
+  function escapeHtml(text) {
+    return text.replace(/[&<>"']/g, (m) => {
+      return ({
+        '&': "&amp;",
+        '<': "&lt;",
+        '>': "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      })[m];
     });
   }
-
-  function toggleAuthState() {
-    const uid = sessionStorage.getItem('userUID');
-    const name = sessionStorage.getItem('userName');
-    document.getElementById('dream-section').style.display = uid ? 'block' : 'none';
-    document.getElementById('logoutBtn').style.display = uid ? 'inline-block' : 'none';
-    document.getElementById('auth-msg').textContent = uid ? `Welcome, ${name}!` : '';
-    loadDreams();
-  }
-
-  function postDream() {
-    const dream = document.getElementById('travelDream').value.trim();
-    const uid = sessionStorage.getItem('userUID');
-    const name = sessionStorage.getItem('userName');
-    if (!dream || !uid) return alert("Please write your dream and log in.");
-    db.collection('travelDreams').add({
-      uid, name, dream,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(() => {
-      document.getElementById('travelDream').value = '';
-      loadDreams();
-    }).catch(e => alert(e.message));
-  }
-
-  function loadDreams() {
-    const uid = sessionStorage.getItem('userUID');
-    const container = document.getElementById('dreams');
-    db.collection('travelDreams').orderBy('timestamp', 'desc').get()
-      .then(snapshot => {
-        container.innerHTML = '';
-        if (snapshot.empty) return container.innerHTML = "<p>No dreams yet. Be the first!</p>";
-        snapshot.forEach(doc => {
-          const data = doc.data();
-          const div = document.createElement('div');
-          div.innerHTML = `<strong>${data.name}</strong>: ${data.dream}`;
-          if (data.uid === uid) {
-            const btn = document.createElement('button');
-            btn.textContent = "Delete";
-            btn.className = "delete-btn";
-            btn.onclick = () => deleteDream(doc.id);
-            div.appendChild(btn);
-          }
-          container.appendChild(div);
-        });
-      });
-  }
-
-  function deleteDream(id) {
-    const uid = sessionStorage.getItem('userUID');
-    db.collection('travelDreams').doc(id).get()
-      .then(doc => {
-        if (!doc.exists || doc.data().uid !== uid) return alert("You can only delete your own dream.");
-        return db.collection('travelDreams').doc(id).delete();
-      }).then(loadDreams).catch(e => alert(e.message));
-  }
-
-  window.onload = toggleAuthState;
 </script>
+
 </body>
 </html>
-
-  
-
-
-  
-
-  
-   
-
-    
-
-
-
- 
-
-
-   
-
-
-
-
-
-      
-
