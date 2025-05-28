@@ -1,199 +1,244 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>HoPh - The Hodophiles Club</title>
-
-<!-- Firebase SDKs (compat version) -->
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-
-<style>
-  body {
-    background-color: #008080; /* teal */
-    color: #fff;
-    font-family: 'Georgia', serif;
-    margin: 0;
-    padding: 0 20px;
-  }
-  h1, h2 {
-    font-family: 'Brush Script MT', cursive;
-  }
-  .container {
-    max-width: 700px;
-    margin: 30px auto;
-    background: rgba(255,255,255,0.1);
-    border-radius: 12px;
-    padding: 20px;
-  }
-  label, input, textarea, button {
-    display: block;
-    width: 100%;
-    margin-bottom: 15px;
-  }
-  input, textarea {
-    font-family: 'Georgia', serif;
-    font-size: 1.1em;
-    padding: 8px;
-    border-radius: 6px;
-    border: none;
-  }
-  button {
-    background-color: #004d4d;
-    color: white;
-    font-weight: bold;
-    padding: 12px;
-    border: none;
-    cursor: pointer;
-    border-radius: 8px;
-  }
-  button:hover {
-    background-color: #006666;
-  }
-  .dream {
-    background: rgba(255,255,255,0.15);
-    border-radius: 8px;
-    padding: 12px;
-    margin-bottom: 12px;
-  }
-  .dream .name {
-    font-weight: bold;
-    font-size: 1.2em;
-  }
-  .wanderlust-section {
-    margin-top: 40px;
-    background: rgba(255,255,255,0.1);
-    border-radius: 12px;
-    padding: 20px;
-  }
-  .wanderlust-section ul {
-    list-style-type: none;
-    padding-left: 0;
-  }
-  .wanderlust-section li {
-    margin-bottom: 8px;
-  }
-  .travel-icon {
-    margin-right: 6px;
-    vertical-align: middle;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HoPh - The Hodophiles Club</title>
+  <style>
+    /* Basic Reset */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0; 
+      background: #004d40; /* teal background */
+      color: #e0f2f1;
+      font-family: 'Lucida Calligraphy', cursive, serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    h1, h2, h3 {
+      font-family: 'Lucida Calligraphy', cursive, serif;
+    }
+    input[type="text"], textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 8px;
+      margin-bottom: 16px;
+      border: 2px solid #00796b;
+      border-radius: 6px;
+      font-size: 1em;
+      font-family: inherit;
+      background: #004d40;
+      color: #b2dfdb;
+    }
+    input[type="button"], button {
+      background: #00796b;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      color: #e0f2f1;
+      cursor: pointer;
+      font-size: 1em;
+      font-family: inherit;
+      transition: background 0.3s ease;
+    }
+    input[type="button"]:hover, button:hover {
+      background: #004d40;
+    }
+    #entry-section, #main-section {
+      width: 100%;
+      max-width: 600px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 20px 25px;
+      margin-bottom: 40px;
+      box-shadow: 0 0 12px #00796b;
+    }
+    #dream-list {
+      list-style: none;
+      padding-left: 0;
+      max-height: 300px;
+      overflow-y: auto;
+      border-top: 1px solid #00796b;
+      margin-top: 20px;
+    }
+    #dream-list li {
+      background: #00695c;
+      margin: 8px 0;
+      padding: 12px 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 6px #004d40 inset;
+    }
+    /* Spark Your Wanderlust section */
+    #spark-wanderlust {
+      max-width: 700px; 
+      margin: 0 auto 60px auto; 
+      background: rgba(255, 255, 255, 0.1); 
+      padding: 20px 25px; 
+      border-radius: 10px; 
+      color: #f0f0f0; 
+      font-family: 'Lucida Calligraphy', cursive, serif;
+      box-shadow: 0 0 15px #00796b;
+    }
+    #spark-wanderlust h2, #spark-wanderlust h3 {
+      margin-top: 0;
+    }
+    #spark-wanderlust ul {
+      list-style-position: inside;
+      font-size: 1.1em;
+      padding-left: 0;
+    }
+    #spark-wanderlust ul li {
+      margin-bottom: 10px;
+    }
+  </style>
 </head>
 <body>
 
-<div class="container">
-  <h1>Welcome to HoPh - The Hodophiles Club</h1>
+  <section id="entry-section">
+    <h1>Welcome to HoPh - The Hodophiles Club</h1>
+    <p>Enter your name to begin your journey:</p>
+    <input type="text" id="username" placeholder="Enter your name here" />
+    <input type="button" id="enter-btn" value="Enter" />
+  </section>
 
-  <label for="nameInput">Enter your name:</label>
-  <input type="text" id="nameInput" placeholder="Your name..." />
+  <section id="main-section" style="display:none;">
+    <h2>Hello, <span id="display-name"></span>!</h2>
+    <p>Share your travel dreams below:</p>
+    <textarea id="dream-input" rows="3" placeholder="Describe your travel dream..."></textarea>
+    <input type="button" id="submit-dream" value="Share Dream" />
+    <h3>Community Travel Dreams</h3>
+    <ul id="dream-list"></ul>
+  </section>
 
-  <label for="dreamInput">Share your travel dream:</label>
-  <textarea id="dreamInput" rows="3" placeholder="Describe your dream destination or trip..."></textarea>
-
-  <button id="submitBtn">Share Dream</button>
-
-  <h2>Travel Dreams from Fellow Hodophiles</h2>
-  <div id="dreamsList">
-    <!-- Posted dreams will appear here -->
-  </div>
-
-  <div class="wanderlust-section">
+  <!-- Spark Your Wanderlust Section -->
+  <section id="spark-wanderlust">
     <h2>Spark Your Wanderlust</h2>
 
-    <h3>Recommended Travel Books</h3>
-    <ul>
-      <li>✈️ <em>“On the Road”</em> by Jack Kerouac</li>
-      <li>🌍 <em>“Into the Wild”</em> by Jon Krakauer</li>
-      <li>📚 <em>“Vagabonding”</em> by Rolf Potts</li>
-      <li>📖 <em>“The Alchemist”</em> by Paulo Coelho</li>
-    </ul>
+    <div id="books" style="margin-bottom: 30px;">
+      <h3>Recommended Travel Books</h3>
+      <ul>
+        <li><em>Into the Wild</em> by Jon Krakauer</li>
+        <li><em>Eat, Pray, Love</em> by Elizabeth Gilbert</li>
+        <li><em>Vagabonding</em> by Rolf Potts</li>
+        <li><em>Wild</em> by Cheryl Strayed</li>
+        <li><em>The Art of Travel</em> by Alain de Botton</li>
+      </ul>
+    </div>
 
-    <h3>Famous Travel Destinations</h3>
-    <ul>
-      <li>🏝️ Bali, Indonesia</li>
-      <li>🏰 Paris, France</li>
-      <li>🗻 Kyoto, Japan</li>
-      <li>🏜️ Cappadocia, Turkey</li>
-      <li>🏛️ Rome, Italy</li>
-    </ul>
-  </div>
-</div>
+    <div id="destinations">
+      <h3>Famous Travel Destinations</h3>
+      <ul>
+        <li><strong>Paris, France:</strong> The city of love, art, and iconic landmarks like the Eiffel Tower.</li>
+        <li><strong>Kyoto, Japan:</strong> Stunning temples, traditional tea houses, and beautiful cherry blossoms.</li>
+        <li><strong>Santorini, Greece:</strong> Whitewashed buildings with blue domes overlooking the Aegean Sea.</li>
+        <li><strong>Rome, Italy:</strong> Ancient ruins, delicious cuisine, and vibrant street life.</li>
+        <li><strong>Banff National Park, Canada:</strong> Majestic mountains, turquoise lakes, and amazing hiking trails.</li>
+      </ul>
+    </div>
+  </section>
 
-<script>
-  // Your Firebase config
-  const firebaseConfig = {
-    apiKey: "AIzaSyA_yOkPi4W9mPveWzj6oxPqeBmW9fQ4kM0",
-    authDomain: "hoph-community.firebaseapp.com",
-    projectId: "hoph-community",
-    storageBucket: "hoph-community.appspot.com",
-    messagingSenderId: "71106622256",
-    appId: "1:71106622256:web:9a5e8607a6e06af4394ef5",
-    measurementId: "G-YV8C1HZWCE"
-  };
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
+  <script>
+    // Your Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyA_yOkPi4W9mPveWzj6oxPqeBmW9fQ4kM0",
+      authDomain: "hoph-community.firebaseapp.com",
+      projectId: "hoph-community",
+      storageBucket: "hoph-community.appspot.com",
+      messagingSenderId: "71106622256",
+      appId: "1:71106622256:web:9a5e8607a6e06af4394ef5",
+      measurementId: "G-YV8C1HZWCE"
+    };
 
-  const nameInput = document.getElementById('nameInput');
-  const dreamInput = document.getElementById('dreamInput');
-  const submitBtn = document.getElementById('submitBtn');
-  const dreamsList = document.getElementById('dreamsList');
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-  // Add a new travel dream to Firestore
-  submitBtn.onclick = async () => {
-    const name = nameInput.value.trim();
-    const dream = dreamInput.value.trim();
-    if (!name) {
-      alert("Please enter your name.");
-      return;
-    }
-    if (!dream) {
-      alert("Please write your travel dream.");
-      return;
-    }
+    // DOM Elements
+    const entrySection = document.getElementById('entry-section');
+    const mainSection = document.getElementById('main-section');
+    const usernameInput = document.getElementById('username');
+    const enterBtn = document.getElementById('enter-btn');
+    const displayNameSpan = document.getElementById('display-name');
+    const dreamInput = document.getElementById('dream-input');
+    const submitDreamBtn = document.getElementById('submit-dream');
+    const dreamList = document.getElementById('dream-list');
 
-    try {
-      await db.collection("travelDreams").add({
-        name,
-        dream,
+    let currentUser = '';
+
+    // Enter button click
+    enterBtn.addEventListener('click', () => {
+      const name = usernameInput.value.trim();
+      if (name.length < 2) {
+        alert('Please enter a valid name.');
+        return;
+      }
+      currentUser = name;
+      displayNameSpan.textContent = currentUser;
+      entrySection.style.display = 'none';
+      mainSection.style.display = 'block';
+      loadDreams();
+    });
+
+    // Submit dream
+    submitDreamBtn.addEventListener('click', () => {
+      const dreamText = dreamInput.value.trim();
+      if (dreamText.length < 5) {
+        alert('Please enter a more detailed travel dream.');
+        return;
+      }
+      // Save to Firestore
+      db.collection('dreams').add({
+        name: currentUser,
+        dream: dreamText,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        dreamInput.value = '';
+        loadDreams();
+      }).catch(err => {
+        alert('Error saving dream: ' + err.message);
       });
-      dreamInput.value = "";
-    } catch (error) {
-      alert("Error posting dream: " + error.message);
+    });
+
+    // Load dreams from Firestore
+    function loadDreams() {
+      dreamList.innerHTML = '';
+      db.collection('dreams').orderBy('timestamp', 'desc').limit(30).get()
+        .then(snapshot => {
+          if (snapshot.empty) {
+            dreamList.innerHTML = '<li>No travel dreams shared yet. Be the first!</li>';
+            return;
+          }
+          snapshot.forEach(doc => {
+            const data = doc.data();
+            const li = document.createElement('li');
+            li.textContent = `${data.name}: ${data.dream}`;
+            dreamList.appendChild(li);
+          });
+        })
+        .catch(err => {
+          dreamList.innerHTML = '<li>Error loading dreams.</li>';
+          console.error(err);
+        });
     }
-  };
-
-  // Real-time listener to display dreams
-  db.collection("travelDreams")
-    .orderBy("timestamp", "desc")
-    .onSnapshot((snapshot) => {
-      dreamsList.innerHTML = "";
-      snapshot.forEach((doc) => {
-        const data = doc.data();
-        const div = document.createElement("div");
-        div.className = "dream";
-        div.innerHTML = `<div class="name">🧳 ${escapeHtml(data.name)}</div>
-                         <div class="text">${escapeHtml(data.dream)}</div>`;
-        dreamsList.appendChild(div);
-      });
-    });
-
-  // Basic HTML escaping to prevent injection
-  function escapeHtml(text) {
-    return text.replace(/[&<>"']/g, (m) => {
-      return ({
-        '&': "&amp;",
-        '<': "&lt;",
-        '>': "&gt;",
-        '"': "&quot;",
-        "'": "&#39;"
-      })[m];
-    });
-  }
-</script>
+  </script>
 
 </body>
 </html>
+
+   
+
+  
+
+
+   
+ 
+    
